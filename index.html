@@ -3,70 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CRABPREK — Sensasi Kepiting Geprek Legendaris</title>
+  <title>CRABPREK — Sensasi Seafood Geprek Pedas, Harga Puas!</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- Ambient Flame Mesh -->
-  <div class="bg-gradient"></div>
+  <!-- Ambient Light Orbs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
 
-  <!-- Navbar -->
+  <!-- Navbar Glassmorphism -->
   <header class="navbar" id="navbar">
     <a href="#" class="logo">
-      <span class="logo-box">🦀</span>
+      <span class="logo-icon">🦀</span>
       <span class="logo-text">CRAB<span>PREK</span></span>
     </a>
     <nav class="nav-links">
       <a href="#hero">Beranda</a>
-      <a href="#menu">Menu Populer</a>
+      <a href="#menu">Menu Utama</a>
       <a href="#features">Keunggulan</a>
-      <a href="#order">Lokasi & Pesan</a>
+      <a href="#about">Tentang Kami</a>
+      <a href="#location">Lokasi & Pesan</a>
     </nav>
-    <a href="[suspicious link removed]" target="_blank" class="btn-nav">Pesan Online 💬</a>
+    <a href="[suspicious link removed]!" target="_blank" class="btn-nav">Pesan via WA 📱</a>
   </header>
 
   <!-- Hero Section -->
-  <section id="hero" class="hero">
+  <section id="hero" class="hero-section">
     <div class="hero-container">
-      <div class="hero-text">
-        <div class="badge">🔥 #1 STREET FOOD KEPITING GEPREK</div>
-        <h1>Sensasi Pedas Gurih <br /><span class="accent-text">Kepiting Geprek Legendaris.</span></h1>
-        <p class="subtitle">Daging kepiting segar pilihan dipadu dengan racikan sambal geprek rahasia level 1–10. Nikmati kelezatan bumbu melimpah dengan kualitas rasa bintang lima.</p>
-        
-        <div class="cta-group">
-          <a href="#menu" class="btn btn-primary">Lihat Menu Spesial</a>
-          <a href="#order" class="btn btn-secondary">Cari Cabang Terdekat</a>
+      <div class="hero-text-content">
+        <div class="status-badge">
+          <span class="pulse-dot"></span>
+          #1 BABY CRAB GEPREK UTUH DI PAYAKUMBUH
+        </div>
+        <h1 class="hero-title">
+          Sensasi Seafood Geprek Pedas, <br />
+          <span class="gradient-text">Harga Puas!</span>
+        </h1>
+        <p class="hero-subtitle">
+          Pionir olahan rajungan kecil (baby crab) utuh renyah khas Payakumbuh. Dimakan seluruhnya tanpa ribet kupas cangkang, kaya protein (18-20g), dan disajikan lengkap dengan Nasi Daun Jeruk serta sambal pedas menggugah selera.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="[suspicious link removed]!" target="_blank" class="btn btn-primary">Pesan via WhatsApp 📱</a>
+          <a href="#menu" class="btn btn-outline">Lihat Menu & Harga</a>
         </div>
 
         <div class="hero-stats">
-          <div class="stat-item">
-            <strong>15K+</strong>
-            <span>Porsi Terjual</span>
+          <div class="stat-box">
+            <span class="stat-number">Rp 20.000</span>
+            <span class="stat-label">Porsi Lengkap Hemat</span>
           </div>
           <div class="stat-divider"></div>
-          <div class="stat-item">
-            <strong>4.9 ★</strong>
-            <span>Rating Kepuasan</span>
+          <div class="stat-box">
+            <span class="stat-number">18-20g</span>
+            <span class="stat-label">Protein / 100g Daging</span>
           </div>
           <div class="stat-divider"></div>
-          <div class="stat-item">
-            <strong>100%</strong>
-            <span>Kepiting Segar</span>
+          <div class="stat-box">
+            <span class="stat-number">60 Porsi</span>
+            <span class="stat-label">Kapasitas Fresh / Hari</span>
           </div>
         </div>
       </div>
 
-      <!-- Hero Visual Stage -->
-      <div class="hero-visual">
-        <div class="visual-card-wrapper">
-          <div class="visual-main-card">
-            <div class="crab-illustration">🦀</div>
-            <h3>CRABPREK SIGNATURE</h3>
-            <p>Bumbu Pedas Melimpah & Gurih Meresap</p>
+      <!-- Hero Visual Interactive Stage Canvas -->
+      <div class="hero-visual-stage">
+        <canvas id="hero-canvas"></canvas>
+        <div class="floating-card badge-top">
+          <span class="badge-icon">🦀</span>
+          <div>
+            <strong>100% Makan Utuh</strong>
+            <small>Tanpa Ribet Kupas Cangkang</small>
           </div>
-          <div class="floating-tag tag-top">🔥 Level Pedas 1 - 10</div>
-          <div class="floating-tag tag-bottom">👑 Best Seller #1</div>
+        </div>
+        <div class="floating-card badge-bottom">
+          <span class="badge-icon">📍</span>
+          <div>
+            <strong>Taman Batang Agam</strong>
+            <small>Sabtu & Minggu (07.00-17.00 WIB)</small>
+          </div>
         </div>
       </div>
     </div>
@@ -74,114 +90,151 @@
 
   <!-- Menu Section -->
   <section id="menu" class="section">
-    <div class="section-title">
-      <span>CITA RASA SPESIAL</span>
-      <h2>Menu Populer Hari Ini</h2>
+    <div class="section-header">
+      <span class="section-tag">MARINASI 3 TAHAP & RESEP RAHASIA</span>
+      <h2>Menu Populer <span class="gradient-text">CRABPREK</span></h2>
+      <p>Setiap porsi diolah dari rajungan segar pilihan, dimarinasi cuka, jeruk nipis, & bawang putih, disajikan hangat dengan Nasi Daun Jeruk, Tahu, Tempe, & Lalapan.</p>
     </div>
 
-    <div class="grid">
+    <div class="projects-grid">
       <!-- Card 1 -->
-      <article class="card reveal">
-        <div class="card-media bg-1">
-          <div class="card-icon">🌶️</div>
-          <span class="card-tag">FAVORIT</span>
+      <article class="project-card reveal">
+        <div class="card-media p-grad-1">
+          <div class="media-icon">🌶️</div>
+          <span class="card-tag">BEST SELLER</span>
         </div>
-        <div class="card-body">
-          <span class="card-category">SIGNATURE DISH</span>
-          <h3>Crabprek Jumbo Saus Padang</h3>
-          <p>Kepiting segar 800g disiram saus padang kaya rempah pedas manis yang meresap hingga serat daging terdalam.</p>
-          <div class="card-footer">
-            <div class="price">
-              <small>Mulai dari</small>
-              <strong>Rp 125.000</strong>
-            </div>
-            <a href="[suspicious link removed]" target="_blank" class="btn-sm">Pesan</a>
+        <div class="card-info">
+          <span class="card-meta">PAKET LENGKAP • RP 20.000</span>
+          <h3>Crabprek Original Sambal Bawang</h3>
+          <p>Baby crab utuh goreng renyah keemasan digeprek melimpah dengan ulekan sambal bawang pedas gurih khas racikan CRABPREK.</p>
+          <div class="tag-list">
+            <span>Nasi Daun Jeruk</span>
+            <span>Level 1-10</span>
+            <span>Tahu & Tempe</span>
           </div>
         </div>
       </article>
 
       <!-- Card 2 -->
-      <article class="card reveal">
-        <div class="card-media bg-2">
-          <div class="card-icon">🔥</div>
-          <span class="card-tag">SUPER PEDAS</span>
+      <article class="project-card reveal">
+        <div class="card-media p-grad-2">
+          <div class="media-icon">🔥</div>
+          <span class="card-tag">REKOMENDASI CHEF</span>
         </div>
-        <div class="card-body">
-          <span class="card-category">HOT SPECIAL</span>
-          <h3>Crabprek Sambal Ijo Extra</h3>
-          <p>Kepiting geprek renyah diguyur sambal ijo cabai rawit segar dengan perasan jeruk nipis yang menggugah selera.</p>
-          <div class="card-footer">
-            <div class="price">
-              <small>Mulai dari</small>
-              <strong>Rp 98.000</strong>
-            </div>
-            <a href="[suspicious link removed]" target="_blank" class="btn-sm">Pesan</a>
+        <div class="card-info">
+          <span class="card-meta">PAKET LENGKAP • RP 20.000</span>
+          <h3>Crabprek Saus Padang Rempah</h3>
+          <p>Rajungan kecil renyah disiram saus padang kental kaya rempah Minang pedas manis yang meresap sempurna ke dalam serat daging.</p>
+          <div class="tag-list">
+            <span>Saus Padang</span>
+            <span>Crispy Utuh</span>
+            <span>Lalapan Segar</span>
           </div>
         </div>
       </article>
 
       <!-- Card 3 -->
-      <article class="card reveal">
-        <div class="card-media bg-3">
-          <div class="card-icon">🍲</div>
-          <span class="card-tag">KOMBO HEMAT</span>
+      <article class="project-card reveal">
+        <div class="card-media p-grad-3">
+          <div class="media-icon">🌿</div>
+          <span class="card-tag">PEDAS SEGAR</span>
         </div>
-        <div class="card-body">
-          <span class="card-category">SEAFOOD MIX</span>
-          <h3>Paket Kombo Seafood Geprek</h3>
-          <p>Kombinasi kepiting, udang, cumi, dan kerang hijau dipadukan dengan bumbu geprek mentega gurih pedas.</p>
-          <div class="card-footer">
-            <div class="price">
-              <small>Mulai dari</small>
-              <strong>Rp 145.000</strong>
-            </div>
-            <a href="[suspicious link removed]" target="_blank" class="btn-sm">Pesan</a>
+        <div class="card-info">
+          <span class="card-meta">PAKET LENGKAP • RP 20.000</span>
+          <h3>Crabprek Sambal Ijo Extra</h3>
+          <p>Baby crab renyah diguyur ulekan sambal cabai ijo segar dengan sentuhan perasan jeruk nipis yang menyegarkan aroma.</p>
+          <div class="tag-list">
+            <span>Sambal Ijo</span>
+            <span>Jeruk Nipis</span>
+            <span>Bebas Amis</span>
           </div>
         </div>
       </article>
     </div>
   </section>
 
-  <!-- Features Section -->
+  <!-- Features & USP Section -->
   <section id="features" class="section">
+    <div class="section-header">
+      <span class="section-tag">KEUNGGULAN UTAMA</span>
+      <h2>Mengapa Memilih <span class="gradient-text">CRABPREK?</span></h2>
+      <p>Inovasi kuliner street food yang menjawab kejenuhan olahan ayam dan mahalnya restoran seafood.</p>
+    </div>
+
     <div class="features-grid reveal">
-      <div class="feature-card">
+      <div class="feature-item">
         <div class="f-icon">🦀</div>
-        <h3>100% Kepiting Live Segar</h3>
-        <p>Diolah langsung dari kepiting hidup pilihan untuk menjamin rasa daging tetap manis dan empuk.</p>
+        <h3>Makan Utuh Tanpa Sisa</h3>
+        <p>Baby crab rajungan kecil diolah dengan teknik pelapisan tepung presisi sehingga cangkangnya renyah dan bisa dimakan seluruhnya tanpa perlu dikupas.</p>
       </div>
-      <div class="feature-card">
-        <div class="f-icon">🌶️</div>
-        <h3>Resep Sambal Rahasia</h3>
-        <p>Perpaduan rempah nusantara khas Crabprek dengan pilihan level pedas sesuai selera Anda.</p>
+      <div class="feature-item">
+        <div class="f-icon">🍋</div>
+        <h3>Bebas Amis (Marinasi 3 Tahap)</h3>
+        <p>Proses perendaman bertingkat menggunakan cuka (10 mnt), jeruk nipis (5 mnt), dan ulekan bawang putih giling menjamin aroma segar dan gurih alami.</p>
       </div>
-      <div class="feature-card">
-        <div class="f-icon">⚡</div>
-        <h3>Penyajian Cepat & Higienis</h3>
-        <p>Diproses dengan standar kebersihan tinggi dan disajikan hangat langsung ke meja atau lokasi Anda.</p>
+      <div class="feature-item">
+        <div class="f-icon">💪</div>
+        <h3>Tinggi Protein & Nutrisi</h3>
+        <p>Mengandung 18–20 gram protein per 100 gram daging rajungan, serta kaya akan Omega-3, Kalsium, Zinc, dan Vitamin B12 bagi kesehatan tubuh.</p>
+      </div>
+      <div class="feature-item">
+        <div class="f-icon">💰</div>
+        <h3>Harga Terjangkau Pelajar</h3>
+        <p>Hanya Rp 20.000 per porsi lengkap (25–60% lebih terjangkau dibanding restoran seafood biasa di Payakumbuh).</p>
       </div>
     </div>
   </section>
 
-  <!-- Order & Footer -->
-  <section id="order" class="section">
+  <!-- About Section -->
+  <section id="about" class="section">
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <span class="section-tag">TENTANG KAMI</span>
+        <h2>Inovasi Kuliner Mahasiswa <span class="gradient-text">UNAND Payakumbuh</span></h2>
+        <p>
+          CRABPREK digagas oleh tim mahasiswa Manajemen FEB Universitas Andalas Kampus II Payakumbuh (Rafli Faisal, Ochy Khalilah Putri, Rafiqul Ghozi, & Fardah Khaila) sebagai alternatif kuliner seafood praktis dan terjangkau.
+        </p>
+        <p>
+          Bahan baku baby crab didapatkan langsung dari hasil tangkapan nelayan pesisir lokal Sumatera Barat (Padang & Pariaman), membantu menggerakkan rantai pasok ekonomi daerah sekaligus menghadirkan kualitas terbaik.
+        </p>
+        <div class="skills-grid">
+          <span class="skill-pill">NIB: Legalitas UMKM</span>
+          <span class="skill-pill">Jaminan Halal</span>
+          <span class="skill-pill">Stand Standar Higiene</span>
+          <span class="skill-pill">Penyajian Cepat</span>
+        </div>
+      </div>
+
+      <div class="about-card reveal">
+        <div class="glass-box">
+          <div class="box-icon">📍</div>
+          <h3>Lokasi & Jam Operasional</h3>
+          <p><strong>Stand Penjualan:</strong> Taman Batang Agam, Payakumbuh Barat (Sabtu & Minggu: 07.00 – 17.00 WIB)</p>
+          <p style="margin-top: 10px;"><strong>Dapur Produksi:</strong> Jl. Rasuna Said, Tiakar, Payakumbuh Timur</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact & Order Section -->
+  <section id="location" class="section">
     <div class="contact-box reveal">
-      <span>SIAP MENIKMATI KELAZATANNYA?</span>
-      <h2>Pesan CRABPREK Sekarang</h2>
-      <p>Tersedia layanan pesan antar (Delivery) dan Dine-in di cabang terdekat di kota Anda.</p>
-      <a href="[suspicious link removed]" target="_blank" class="btn btn-primary btn-large">Pesan via WhatsApp 📱</a>
+      <span class="section-tag">METODE PEMBAYARAN: TUNAI & QRIS</span>
+      <h2>Siap Menikmati <span class="gradient-text">Kerenyahan CRABPREK?</span></h2>
+      <p>Kunjungi stand kami di Taman Batang Agam akhir pekan ini, atau amankan porsi Anda melalui pesan antar (Delivery Kurir Internal) & Pre-Order WhatsApp!</p>
+      <a href="[suspicious link removed]!" target="_blank" class="btn btn-primary btn-large">Pesan via WhatsApp Sekarang 💬</a>
     </div>
 
+    <!-- Footer -->
     <footer class="footer">
-      <div class="footer-brand">
+      <div class="footer-left">
         <strong>CRABPREK.ID</strong>
-        <p>© 2026 CRABPREK Indonesia. All Rights Reserved.</p>
+        <span>© 2026 CRABPREK Indonesia. Kelompok 7 Manajemen FEB Universitas Andalas Payakumbuh.</span>
       </div>
       <div class="footer-links">
-        <a href="#">Instagram</a>
-        <a href="#">TikTok</a>
-        <a href="#">GoFood</a>
-        <a href="#">GrabFood</a>
+        <a href="#">Instagram @crabprek</a>
+        <a href="#">TikTok @crabprek</a>
+        <a href="#">WhatsApp Business</a>
       </div>
     </footer>
   </section>

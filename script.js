@@ -171,64 +171,70 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const drawVisualStage = () => {
-      ctx.clearRect(0, 0, width, height);
+  ctx.clearRect(0, 0, width, height);
 
-      mouseX += (targetMouseX - mouseX) * 0.05;
-      mouseY += (targetMouseY - mouseY) * 0.05;
+  // ✅ Lerp lebih lambat → transisi posisi halus, tidak "lompat"
+  mouseX += (targetMouseX - mouseX) * 0.02;
+  mouseY += (targetMouseY - mouseY) * 0.02;
 
-      const scrollSpeed = window.scrollY * 0.002;
-      sphereAngle += 0.008 + scrollSpeed;
+  // ✅ Scroll di-cap → tidak pernah berputar kencang walau scroll jauh
+  const scrollSpeed = Math.min(window.scrollY * 0.0005, 0.002);
+  sphereAngle += 0.004 + scrollSpeed;
 
-      const centerX = width * 0.5 + mouseX * 20;
-      const centerY = height * 0.5 + mouseY * 20;
-      const radius = Math.min(width, height) * 0.32;
+  // ✅ Parallax mouse dikurangi (20px → 10px) → tidak mudah pindah posisi
+  const centerX = width * 0.5 + mouseX * 10;
+  const centerY = height * 0.5 + mouseY * 10;
+  const radius = Math.min(width, height) * 0.32;
 
-      const crabX = Math.cos(crabWalkAngle) * (radius * 0.95);
-      const crabY = -radius * 0.85 + Math.sin(crabWalkAngle * 2) * 8;
-      const crabAbsX = centerX + crabX;
-      const crabAbsY = centerY + crabY;
+  const crabX = Math.cos(crabWalkAngle) * (radius * 0.95);
+  const crabY = -radius * 0.85 + Math.sin(crabWalkAngle * 2) * 8;
+  const crabAbsX = centerX + crabX;
+  const crabAbsY = centerY + crabY;
 
-      const distToPointer = Math.hypot(canvasPointerX - crabAbsX, canvasPointerY - crabAbsY);
-      const isTouchNear = distToPointer < 85;
+  // ✅ Deteksi kursor lebih kecil (85px → 70px) → kepiting lebih jarang kabur
+  const distToPointer = Math.hypot(canvasPointerX - crabAbsX, canvasPointerY - crabAbsY);
+  const isTouchNear = distToPointer < 70;
 
-      if (isTouchNear) {
-        crabFleeSpeed = 0.08;
-      } else {
-        crabFleeSpeed *= 0.92;
-      }
+  // ✅ Kecepatan kabur dikurangi + decay lebih cepat → berhenti lebih cepat
+  if (isTouchNear) {
+    crabFleeSpeed = 0.03;
+  } else {
+    crabFleeSpeed *= 0.94;
+  }
 
-      crabWalkAngle += 0.012 + crabFleeSpeed + scrollSpeed * 1.5;
+  // ✅ Efek scroll ke kepiting dikurangi (1.5 → 0.4) → tidak "loncat"
+  crabWalkAngle += 0.010 + crabFleeSpeed + scrollSpeed * 0.4;
 
-      ctx.save();
-      ctx.translate(centerX, centerY);
+  ctx.save();
+  ctx.translate(centerX, centerY);
 
-      for (let i = 0; i < particleCount; i++) {
-        const phi = Math.acos(-1 + (2 * i) / particleCount);
-        const theta = Math.sqrt(particleCount * Math.PI) * phi + sphereAngle;
+  for (let i = 0; i < particleCount; i++) {
+    const phi = Math.acos(-1 + (2 * i) / particleCount);
+    const theta = Math.sqrt(particleCount * Math.PI) * phi + sphereAngle;
 
-        const x = radius * Math.cos(theta) * Math.sin(phi);
-        const y = radius * Math.sin(theta) * Math.sin(phi);
-        const z = radius * Math.cos(phi);
+    const x = radius * Math.cos(theta) * Math.sin(phi);
+    const y = radius * Math.sin(theta) * Math.sin(phi);
+    const z = radius * Math.cos(phi);
 
-        const scale = (z + radius * 1.5) / (radius * 2);
-        const alpha = Math.max(0.1, scale * 0.75);
+    const scale = (z + radius * 1.5) / (radius * 2);
+    const alpha = Math.max(0.1, scale * 0.75);
 
-        ctx.beginPath();
-        ctx.arc(x, y, 3 * scale, 0, Math.PI * 2);
-        
-        const hue = 10 + (z / radius) * 30;
-        ctx.fillStyle = `hsla(${hue}, 95%, 60%, ${alpha})`;
-        ctx.fill();
-      }
+    ctx.beginPath();
+    ctx.arc(x, y, 3 * scale, 0, Math.PI * 2);
 
-      const crabScale = 0.85 + Math.sin(crabWalkAngle) * 0.15;
-      const legCycleSpeed = isTouchNear ? crabWalkAngle * 18 : crabWalkAngle * 6;
+    const hue = 10 + (z / radius) * 30;
+    ctx.fillStyle = `hsla(${hue}, 95%, 60%, ${alpha})`;
+    ctx.fill();
+  }
 
-      drawProceduralCrab(crabX, crabY, crabScale, legCycleSpeed, isTouchNear || crabFleeSpeed > 0.02);
+  const crabScale = 0.85 + Math.sin(crabWalkAngle) * 0.15;
+  const legCycleSpeed = isTouchNear ? crabWalkAngle * 18 : crabWalkAngle * 6;
 
-      ctx.restore();
-      requestAnimationFrame(drawVisualStage);
-    };
+  drawProceduralCrab(crabX, crabY, crabScale, legCycleSpeed, isTouchNear || crabFleeSpeed > 0.02);
+
+  ctx.restore();
+  requestAnimationFrame(drawVisualStage);
+};
 
     drawVisualStage();
   }

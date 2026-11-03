@@ -92,22 +92,33 @@ html {
   font-size: 20px;
 }
 
+/* === Logo Revisi: Badge Gradient Rapi === */
 .logo-wrapper {
-  background: transparent;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-orange) 100%);
   display: flex;
   align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(255, 59, 48, 0.45),
+              inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
 }
 
 .logo-img {
-  height: 42px;
-  width: auto;
-  object-fit: contain;
-  mix-blend-mode: lighten;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .logo-fallback-icon {
   font-size: 24px;
   display: none;
+  line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
 }
 
 .logo-text span {

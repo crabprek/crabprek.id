@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       waMessage += `\nMohon diproses ya kak. Terima kasih! 🦀🔥`;
 
-      const waUrl = `[suspicious link removed]{encodeURIComponent(waMessage)}`;
+      const waUrl = `https://wa.me/6282362129646?text=${encodeURIComponent(waMessage)}`;
       window.location.href = waUrl;
     });
   }

@@ -8,6 +8,9 @@
 </head>
 <body>
 
+  <!-- Custom Cursor Particle Canvas (Jejak Bumbu Glowing) -->
+  <canvas id="trail-canvas"></canvas>
+
   <!-- Ambient Light Orbs -->
   <div class="glow-orb orb-1"></div>
   <div class="glow-orb orb-2"></div>
@@ -27,7 +30,7 @@
       <a href="#order-form">Pesan Langsung</a>
       <a href="#info">Lokasi & Jam</a>
     </nav>
-    <a href="#order-form" class="btn-nav">Pesan Sekarang 🛒</a>
+    <a href="#order-form" class="btn-nav">Pesan WA 🛒</a>
   </header>
 
   <!-- Hero Section -->
@@ -43,7 +46,7 @@
           <span class="gradient-text">Padehnyo Mupakaiak!</span>
         </h1>
         <p class="hero-subtitle">
-          Satu-satunyo kepiting renyah porsi pas (ukuran 4 jari tangan) di Payakumbuh yang biso dimakan lansung tanpa ribet kupas cangkang! Digeprek jo Sambal Geprek khas racikan Crabprek, disajikan hangat bareng Nasi Putih, Tahu, Tempe, & Lalapan.
+          Satu-satunyo kepiting renyah porsi pas di Payakumbuh yang biso dimakan lansung tanpa ribet kupas cangkang! Digeprek jo Sambal Geprek khas racikan Crabprek, disajikan hangat bareng Nasi Putih, Tahu, Tempe, & Lalapan.
         </p>
 
         <div class="hero-buttons">
@@ -69,14 +72,14 @@
         </div>
       </div>
 
-      <!-- Hero Visual Stage (Canvas Interactive + Scroll Driven) -->
+      <!-- Hero Visual Stage Canvas 3D (Bola & Kepiting Interaktif) -->
       <div class="hero-visual-stage">
         <canvas id="hero-canvas"></canvas>
         <div class="floating-card badge-top">
-          <span class="badge-icon">💨</span>
+          <span class="badge-icon">✨</span>
           <div>
             <strong>Interactive Visuals</strong>
-            <small>Coba Touch / Scroll Layar!</small>
+            <small>Gerakkan Kursor / Sentuh Layar!</small>
           </div>
         </div>
         <div class="floating-card badge-bottom">
@@ -98,7 +101,7 @@
       <p>Menu ikonik pilihan utama pecinta kuliner seafood pedas di Payakumbuh.</p>
     </div>
 
-    <div class="product-showcase reveal">
+    <div class="product-showcase reveal tilt-card">
       <div class="product-media-box">
         <div class="product-badge-glow">BEST SELLER</div>
         <img src="crabprek-sambel-geprek.jpg" alt="Crabprek Sambel Geprek" class="product-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
@@ -110,13 +113,13 @@
         <span class="product-category">AUTHENTIC CRAFTED RECIPE</span>
         <h3>Crabprek Sambel Geprek</h3>
         <p class="product-desc">
-          Kepiting olahan segar pilihan (ukuran 4 jari tangan) yang digoreng garing keemasan hingga cangkangnya renyah empuk, lalu digeprek melimpah dengan ulekan **Sambal Geprek khas Crabprek** yang gurih dan pedas mantap.
+          Kepiting olahan segar pilihan porsi pas yang digoreng garing keemasan hingga cangkangnya renyah empuk, lalu digeprek melimpah dengan ulekan **Sambal Geprek khas Crabprek** yang gurih dan pedas mantap.
         </p>
 
         <div class="product-includes">
           <strong>Isian Paket Lengkap:</strong>
           <ul>
-            <li>🦀 Kepiting Renyah Utuh (Ukuran 4 Jari)</li>
+            <li>🦀 Kepiting Renyah Utuh Porsi Pas</li>
             <li>🍚 Nasi Putih Hangat</li>
             <li>🔥 Sambal Geprek Khas Crabprek</li>
             <li>🧈 Tahu & Tempe Goreng + Lalapan Segar</li>
@@ -134,62 +137,102 @@
     </div>
   </section>
 
-  <!-- Order Form Section (Pemesanan Otomatis ke WA tanpa Level Pedas) -->
+  <!-- Interactive Order Form Section (Auto WA +62 823-6212-9646) -->
   <section id="order-form" class="section">
     <div class="order-card-wrapper reveal">
       <div class="section-header">
         <span class="section-tag">PEMESANAN ONLINE INSTAN</span>
         <h2>Formulir Pesanan <span class="gradient-text">CRABPREK</span></h2>
-        <p>Isi detail pesanan Anda di bawah ini, lalu klik tombol untuk langsung terhubung ke WhatsApp resmi kami.</p>
+        <p>Isi detail pesanan Anda di bawah ini, total harga akan dihitung otomatis!</p>
       </div>
 
       <form id="wa-order-form" class="order-form">
         <div class="form-grid">
           
           <!-- Nama Pemesan -->
-          <div class="form-group">
+          <div class="form-group full-width">
             <label for="cust-name">Nama Pemesan / Pembeli *</label>
             <input type="text" id="cust-name" placeholder="Masukkan nama Anda..." required />
           </div>
 
-          <!-- Jumlah Porsi -->
-          <div class="form-group">
-            <label for="cust-qty">Jumlah Porsi (Rp 18.000/porsi) *</label>
-            <input type="number" id="cust-qty" min="1" max="50" value="1" required />
+          <!-- Counter Kuantitas Interaktif -->
+          <div class="form-group full-width">
+            <label>Jumlah Porsi (Rp 18.000/porsi) *</label>
+            <div class="qty-counter-wrapper">
+              <button type="button" class="btn-qty-step" id="btn-qty-minus">−</button>
+              <input type="number" id="cust-qty" min="1" max="50" value="1" readonly />
+              <button type="button" class="btn-qty-step" id="btn-qty-plus">+</button>
+            </div>
           </div>
 
-          <!-- Tipe Layanan -->
+          <!-- Card Tipe Layanan (Dine-in / Takeaway / Delivery) -->
           <div class="form-group full-width">
-            <label for="cust-service">Jenis Pesanan *</label>
-            <select id="cust-service">
-              <option value="Dine-in / Makan di Stand Taman Batang Agam">Makan di Tempat (Stand Batang Agam)</option>
-              <option value="Bungkus / Takeaway di Stand">Bungkus / Takeaway (Stand Batang Agam)</option>
-              <option value="Pesan Antar / Delivery Payakumbuh">Pesan Antar (Delivery Area Payakumbuh)</option>
-            </select>
+            <label>Pilih Jenis Pesanan *</label>
+            <div class="service-cards-grid">
+              <label class="service-card active">
+                <input type="radio" name="service-type" value="Makan di Tempat (Stand Batang Agam)" checked />
+                <span class="s-icon">🍽️</span>
+                <strong>Makan di Stand</strong>
+                <small>Taman Batang Agam</small>
+              </label>
+
+              <label class="service-card">
+                <input type="radio" name="service-type" value="Bungkus / Takeaway (Stand Batang Agam)" />
+                <span class="s-icon">🛍️</span>
+                <strong>Bungkus / Takeaway</strong>
+                <small>Ambil di Stand</small>
+              </label>
+
+              <label class="service-card">
+                <input type="radio" name="service-type" value="Pesan Antar / Delivery Payakumbuh" />
+                <span class="s-icon">🛵</span>
+                <strong>Delivery Antar</strong>
+                <small>Area Payakumbuh</small>
+              </label>
+            </div>
           </div>
 
-          <!-- Alamat Pengiriman -->
+          <!-- Ekstra Tambahan Checkbox -->
           <div class="form-group full-width">
-            <label for="cust-address">Alamat Pengiriman / Lokasi Antar (Jika Delivery)</label>
+            <label>Ekstra Tambahan (Opsional):</label>
+            <div class="extras-grid">
+              <label class="extra-chip">
+                <input type="checkbox" value="Ekstra Sambal Geprek (+Rp 3.000)" data-price="3000" class="extra-item" />
+                <span>🌶️ Ekstra Sambal Geprek (+Rp 3k)</span>
+              </label>
+              <label class="extra-chip">
+                <input type="checkbox" value="Ekstra Nasi Putih (+Rp 4.000)" data-price="4000" class="extra-item" />
+                <span>🍚 Ekstra Nasi Putih (+Rp 4k)</span>
+              </label>
+              <label class="extra-chip">
+                <input type="checkbox" value="Ekstra Tahu & Tempe (+Rp 3.000)" data-price="3000" class="extra-item" />
+                <span>🧈 Ekstra Tahu & Tempe (+Rp 3k)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Alamat / Patokan -->
+          <div class="form-group full-width">
+            <label for="cust-address">Alamat Pengiriman / Patokan (Khusus Delivery)</label>
             <input type="text" id="cust-address" placeholder="Contoh: Jl. Sudirman No. 12, dekat Masjid Agung..." />
           </div>
 
-          <!-- Catatan Tambahan -->
+          <!-- Catatan Khusus -->
           <div class="form-group full-width">
-            <label for="cust-note">Catatan Khusus (Opsional)</label>
-            <textarea id="cust-note" rows="2" placeholder="Contoh: Sambal dipisah, tahu diganti tempe, dll..."></textarea>
+            <label for="cust-note">Catatan Khusus</label>
+            <textarea id="cust-note" rows="2" placeholder="Contoh: Sambal dipisah, dll..."></textarea>
           </div>
 
         </div>
 
-        <!-- Live Price Calculator Summary -->
+        <!-- Summary & Tombol Kirim WA -->
         <div class="order-summary-box">
           <div class="summary-text">
-            <span>Total Pembayaran:</span>
+            <span>Total Pembayaran Est:</span>
             <strong id="live-total-price">Rp 18.000</strong>
           </div>
           <button type="submit" class="btn btn-primary btn-large btn-submit-wa">
-            Kirim Pesanan ke WhatsApp 💬
+            Kirim Pesanan ke WA (+62 823-6212-9646) 💬
           </button>
         </div>
       </form>
@@ -236,7 +279,7 @@
         <span>© 2026 CRABPREK Indonesia. All Rights Reserved.</span>
       </div>
       <div class="footer-links">
-        <a href="[suspicious link removed]" target="_blank">WhatsApp Business</a>
+        <a href="[suspicious link removed]" target="_blank">WhatsApp (+62 823-6212-9646)</a>
         <a href="#">Instagram @crabprek</a>
         <a href="#">TikTok @crabprek</a>
       </div>

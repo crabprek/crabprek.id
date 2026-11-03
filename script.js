@@ -1,15 +1,82 @@
 /* ==========================================================================
-   CRABPREK CANVAS ENGINE (BOLA 3D BERPUTAR + KEPITING MERANGKAK INTERAKTIF)
+   CRABPREK JAVASCRIPT ENGINE (SCATTERING CRAB, TRAIL & AUTO WA ORDER)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  // --------------------------------------------------------------------------
+  // 1. CUSTOM CURSOR TRAIL ENGINE (JEJAK BUMBU GLOWING BEBAS LAG)
+  // --------------------------------------------------------------------------
+  const trailCanvas = document.getElementById('trail-canvas');
+  if (trailCanvas) {
+    const tCtx = trailCanvas.getContext('2d');
+    let tWidth = trailCanvas.width = window.innerWidth;
+    let tHeight = trailCanvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      tWidth = trailCanvas.width = window.innerWidth;
+      tHeight = trailCanvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+
+    const addParticle = (x, y) => {
+      if (particles.length > 40) particles.shift();
+      particles.push({
+        x: x,
+        y: y,
+        size: Math.random() * 6 + 3,
+        alpha: 1,
+        color: Math.random() > 0.5 ? '#ff3b30' : '#ffb703',
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5 - 1
+      });
+    };
+
+    window.addEventListener('mousemove', (e) => addParticle(e.clientX, e.clientY));
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        addParticle(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    const animateTrail = () => {
+      tCtx.clearRect(0, 0, tWidth, tHeight);
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.025;
+
+        if (p.alpha > 0) {
+          tCtx.save();
+          tCtx.globalAlpha = p.alpha;
+          tCtx.fillStyle = p.color;
+          tCtx.shadowBlur = 10;
+          tCtx.shadowColor = p.color;
+          tCtx.beginPath();
+          tCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          tCtx.fill();
+          tCtx.restore();
+        }
+      }
+      requestAnimationFrame(animateTrail);
+    };
+    animateTrail();
+  }
+
+  // --------------------------------------------------------------------------
+  // 2. CANVAS 3D ENGINE (BOLA & KEPITING INTERAKTIF KABUR SAAT DI-TOUCH)
+  // --------------------------------------------------------------------------
   const canvas = document.getElementById('hero-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
     let width, height;
     let mouseX = 0, mouseY = 0;
     let targetMouseX = 0, targetMouseY = 0;
+
+    let canvasPointerX = -9999;
+    let canvasPointerY = -9999;
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
@@ -19,32 +86,47 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', resize);
     resize();
 
-    window.addEventListener('mousemove', (e) => {
-      targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-      targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-    });
+    const updatePointerPos = (clientX, clientY) => {
+      const rect = canvas.getBoundingClientRect();
+      canvasPointerX = clientX - rect.left;
+      canvasPointerY = clientY - rect.top;
+
+      targetMouseX = (clientX / window.innerWidth - 0.5) * 2;
+      targetMouseY = (clientY / window.innerHeight - 0.5) * 2;
+    };
+
+    window.addEventListener('mousemove', (e) => updatePointerPos(e.clientX, e.clientY));
+    
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) {
+        updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
 
     const particleCount = 110;
     let sphereAngle = 0;
-    let crabWalkAngle = 0; // Sudut posisi merangkak kepiting di atas bola
+    let crabWalkAngle = 0;
+    let crabFleeSpeed = 0;
 
-    // Fungsi menggambar grafis procedural Kepiting Merangkak di Canvas 3D
-    const drawProceduralCrab = (x, y, scale, legCycle) => {
+    const drawProceduralCrab = (x, y, scale, legCycle, isFleeing) => {
       ctx.save();
       ctx.translate(x, y);
       ctx.scale(scale, scale);
 
-      // Warna Kepiting Merah-Oranye Neon
-      ctx.fillStyle = '#ff3b30';
-      ctx.shadowBlur = 12;
-      ctx.shadowColor = '#ff6b35';
+      ctx.fillStyle = isFleeing ? '#ff1100' : '#ff3b30';
+      ctx.shadowBlur = isFleeing ? 20 : 12;
+      ctx.shadowColor = isFleeing ? '#ffb703' : '#ff6b35';
 
-      // 1. Badan Kepiting (Oval)
       ctx.beginPath();
       ctx.ellipse(0, 0, 16, 11, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // 2. Mata Kepiting (2 Tangkai Kecil)
       ctx.fillStyle = '#fff';
       ctx.beginPath();
       ctx.arc(-6, -13, 3, 0, Math.PI * 2);
@@ -57,27 +139,23 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.arc(6, -14, 1.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // 3. Supit / Claws (Kiri & Kanan)
       ctx.strokeStyle = '#ff3b30';
       ctx.lineWidth = 3.5;
       
-      // Capit Kiri
       ctx.beginPath();
       ctx.moveTo(-10, -6);
       ctx.quadraticCurveTo(-18, -16, -12, -20);
       ctx.stroke();
 
-      // Capit Kanan
       ctx.beginPath();
       ctx.moveTo(10, -6);
       ctx.quadraticCurveTo(18, -16, 12, -20);
       ctx.stroke();
 
-      // 4. Kaki Kepiting (Kaki Bergerak Mengayuh)
       ctx.lineWidth = 2;
       for (let side = -1; side <= 1; side += 2) {
         for (let i = 0; i < 3; i++) {
-          const legPhase = Math.sin(legCycle + i * 0.8) * 4;
+          const legPhase = Math.sin(legCycle + i * 0.8) * (isFleeing ? 7 : 4);
           const startX = side * 12;
           const startY = -2 + i * 5;
           
@@ -89,29 +167,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      if (isFleeing) {
+        ctx.fillStyle = '#ffb703';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText('💨 KABUR!', -20, -28);
+      }
+
       ctx.restore();
     };
 
     const drawVisualStage = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Mouse Lerp Smooth Movement
       mouseX += (targetMouseX - mouseX) * 0.05;
       mouseY += (targetMouseY - mouseY) * 0.05;
 
-      // Rotasi bola dipengaruhi oleh scroll
       const scrollSpeed = window.scrollY * 0.002;
       sphereAngle += 0.008 + scrollSpeed;
-      crabWalkAngle += 0.015 + scrollSpeed * 1.5;
 
       const centerX = width * 0.5 + mouseX * 20;
       const centerY = height * 0.5 + mouseY * 20;
       const radius = Math.min(width, height) * 0.32;
 
+      const crabX = Math.cos(crabWalkAngle) * (radius * 0.95);
+      const crabY = -radius * 0.85 + Math.sin(crabWalkAngle * 2) * 8;
+      const crabAbsX = centerX + crabX;
+      const crabAbsY = centerY + crabY;
+
+      const distToPointer = Math.hypot(canvasPointerX - crabAbsX, canvasPointerY - crabAbsY);
+      const isTouchNear = distToPointer < 85;
+
+      if (isTouchNear) {
+        crabFleeSpeed = 0.08;
+      } else {
+        crabFleeSpeed *= 0.92;
+      }
+
+      crabWalkAngle += 0.012 + crabFleeSpeed + scrollSpeed * 1.5;
+
       ctx.save();
       ctx.translate(centerX, centerY);
 
-      // --- A. DRAW BOLA 3D PARTIKEL ---
       for (let i = 0; i < particleCount; i++) {
         const phi = Math.acos(-1 + (2 * i) / particleCount);
         const theta = Math.sqrt(particleCount * Math.PI) * phi + sphereAngle;
@@ -126,18 +222,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.beginPath();
         ctx.arc(x, y, 3 * scale, 0, Math.PI * 2);
         
-        const hue = 10 + (z / radius) * 30; // Merah ke Gold
+        const hue = 10 + (z / radius) * 30;
         ctx.fillStyle = `hsla(${hue}, 95%, 60%, ${alpha})`;
         ctx.fill();
       }
 
-      // --- B. DRAW KEPITING MERANGKAK DI ATAS BOLA ---
-      // Posisi kepiting berada di sepanjang kurva lingkaran atas bola
-      const crabX = Math.cos(crabWalkAngle) * (radius * 0.95);
-      const crabY = -radius * 0.85 + Math.sin(crabWalkAngle * 2) * 8; 
       const crabScale = 0.85 + Math.sin(crabWalkAngle) * 0.15;
+      const legCycleSpeed = isTouchNear ? crabWalkAngle * 18 : crabWalkAngle * 6;
 
-      drawProceduralCrab(crabX, crabY, crabScale, crabWalkAngle * 5);
+      drawProceduralCrab(crabX, crabY, crabScale, legCycleSpeed, isTouchNear || crabFleeSpeed > 0.02);
 
       ctx.restore();
       requestAnimationFrame(drawVisualStage);
@@ -146,7 +239,135 @@ document.addEventListener('DOMContentLoaded', () => {
     drawVisualStage();
   }
 
-  // Transisi Navbar saat di-scroll
+  // --------------------------------------------------------------------------
+  // 3. FORM PEMESANAN INTERAKTIF & AUTO WA (+62 823-6212-9646)
+  // --------------------------------------------------------------------------
+  const qtyInput = document.getElementById('cust-qty');
+  const btnMinus = document.getElementById('btn-qty-minus');
+  const btnPlus = document.getElementById('btn-qty-plus');
+  const livePriceEl = document.getElementById('live-total-price');
+  const waForm = document.getElementById('wa-order-form');
+  const serviceCards = document.querySelectorAll('.service-card');
+  const extraCheckboxes = document.querySelectorAll('.extra-item');
+
+  const BASE_PRICE = 18000;
+
+  const calculateTotal = () => {
+    let qty = parseInt(qtyInput.value) || 1;
+    let total = qty * BASE_PRICE;
+
+    extraCheckboxes.forEach(cb => {
+      if (cb.checked) {
+        total += (parseInt(cb.getAttribute('data-price')) || 0) * qty;
+      }
+    });
+
+    if (livePriceEl) {
+      livePriceEl.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+    }
+  };
+
+  if (btnMinus && btnPlus && qtyInput) {
+    btnMinus.addEventListener('click', () => {
+      let val = parseInt(qtyInput.value) || 1;
+      if (val > 1) {
+        qtyInput.value = val - 1;
+        calculateTotal();
+      }
+    });
+
+    btnPlus.addEventListener('click', () => {
+      let val = parseInt(qtyInput.value) || 1;
+      qtyInput.value = val + 1;
+      calculateTotal();
+    });
+  }
+
+  extraCheckboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
+
+  // Service Type Radio Toggle UI
+  serviceCards.forEach(card => {
+    card.addEventListener('click', () => {
+      serviceCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const radio = card.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+    });
+  });
+
+  // Submit Form -> Auto Redirect WhatsApp (+62 823-6212-9646)
+  if (waForm) {
+    waForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('cust-name').value.trim();
+      const qty = parseInt(qtyInput.value) || 1;
+      
+      let selectedService = "Makan di Tempat";
+      const activeRadio = document.querySelector('input[name="service-type"]:checked');
+      if (activeRadio) selectedService = activeRadio.value;
+
+      const address = document.getElementById('cust-address').value.trim();
+      const note = document.getElementById('cust-note').value.trim();
+
+      // Kumpulkan Ekstra
+      let selectedExtras = [];
+      extraCheckboxes.forEach(cb => {
+        if (cb.checked) selectedExtras.push(cb.value);
+      });
+
+      let currentTotalText = livePriceEl ? livePriceEl.textContent : `Rp ${(qty * BASE_PRICE).toLocaleString('id-ID')}`;
+
+      // Format Draf Pesan WA Rapi
+      let waMessage = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
+      waMessage += `📋 *DETAIL PESANAN:*\n`;
+      waMessage += `• Menu Utama: *Crabprek Sambel Geprek*\n`;
+      waMessage += `• Jumlah: *${qty} Porsi*\n`;
+      waMessage += `• Layanan: *${selectedService}*\n`;
+      if (selectedExtras.length > 0) {
+        waMessage += `• Ekstra: ${selectedExtras.join(', ')}\n`;
+      }
+      waMessage += `• Total Est: *${currentTotalText}*\n\n`;
+      
+      waMessage += `👤 *DATA PEMESAN:*\n`;
+      waMessage += `• Nama: ${name}\n`;
+      if (address) waMessage += `• Alamat/Lokasi: ${address}\n`;
+      if (note) waMessage += `• Catatan: ${note}\n`;
+
+      waMessage += `\nMohon diproses ya kak. Terima kasih! 🦀🔥`;
+
+      const waNumber = '6282362129646';
+      const encodedMsg = encodeURIComponent(waMessage);
+      const waUrl = `[suspicious link removed]{waNumber}?text=${encodedMsg}`;
+
+      window.open(waUrl, '_blank');
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 4. PARALLAX 3D TILT ON HOVER FOR PRODUCT SHOWCASE
+  // --------------------------------------------------------------------------
+  const tiltCard = document.querySelector('.tilt-card');
+  if (tiltCard) {
+    tiltCard.addEventListener('mousemove', (e) => {
+      const rect = tiltCard.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      
+      const tiltX = (y / rect.height) * -12;
+      const tiltY = (x / rect.width) * 12;
+
+      tiltCard.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+    });
+
+    tiltCard.addEventListener('mouseleave', () => {
+      tiltCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. NAVBAR SCROLL SHIFT & SCROLL REVEAL OBSERVER
+  // --------------------------------------------------------------------------
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
     if (window.scrollY > 40) {
@@ -160,7 +381,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Scroll Reveal Observer
   const reveals = document.querySelectorAll('.reveal');
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {

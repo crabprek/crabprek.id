@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CRABPREK STYLESHEET (DARK MODE & TRANSPARENT LOGO)
+   CRABPREK INTERACTIVE & KINETIC STYLESHEET
    ========================================================================== */
 
 :root {
@@ -26,6 +26,17 @@ html {
   color: var(--text-main);
   font-family: var(--font-family);
   overflow-x: hidden;
+}
+
+/* Custom Cursor Trail Canvas */
+#trail-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
 }
 
 .glow-orb {
@@ -345,7 +356,7 @@ html {
   line-height: 1.6;
 }
 
-/* Product Showcase */
+/* Tilt Product Showcase */
 .product-showcase {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
@@ -356,6 +367,8 @@ html {
   padding: 40px;
   backdrop-filter: blur(16px);
   align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transform-style: preserve-3d;
 }
 
 .product-media-box {
@@ -471,7 +484,7 @@ html {
   font-weight: 800;
 }
 
-/* Order Form Styling */
+/* Order Form Styling & Counter */
 .order-card-wrapper {
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
@@ -508,8 +521,7 @@ html {
   color: var(--text-main);
 }
 
-.form-group input,
-.form-group select,
+.form-group input[type="text"],
 .form-group textarea {
   background: rgba(10, 12, 18, 0.8);
   border: 1px solid var(--border-glass);
@@ -522,9 +534,128 @@ html {
 }
 
 .form-group input:focus,
-.form-group select:focus,
 .form-group textarea:focus {
   border-color: var(--accent-red);
+}
+
+/* Quantity Counter Custom UI */
+.qty-counter-wrapper {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(10, 12, 18, 0.9);
+  border: 1px solid var(--border-glass);
+  border-radius: 50px;
+  padding: 4px;
+  width: fit-content;
+}
+
+.btn-qty-step {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent-red);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.btn-qty-step:hover {
+  background: var(--accent-orange);
+}
+
+.qty-counter-wrapper input {
+  width: 60px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  outline: none;
+}
+
+/* Service Type Cards (Radio Buttons) */
+.service-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.service-card {
+  position: relative;
+  background: rgba(10, 12, 18, 0.6);
+  border: 1px solid var(--border-glass);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.service-card input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.service-card .s-icon {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+
+.service-card strong {
+  font-size: 13px;
+  display: block;
+  color: var(--text-main);
+}
+
+.service-card small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.service-card.active {
+  border-color: var(--accent-red);
+  background: rgba(255, 59, 48, 0.12);
+  box-shadow: 0 4px 15px rgba(255, 59, 48, 0.2);
+}
+
+/* Extras Checkboxes */
+.extras-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.extra-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 50px;
+  background: rgba(10, 12, 18, 0.6);
+  border: 1px solid var(--border-glass);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.extra-chip input {
+  accent-color: var(--accent-red);
+}
+
+.extra-chip:has(input:checked) {
+  border-color: var(--accent-gold);
+  background: rgba(255, 183, 3, 0.1);
+  color: var(--accent-gold);
 }
 
 .order-summary-box {
@@ -621,6 +752,7 @@ html {
 
 @media (max-width: 850px) {
   .hero-container, .product-showcase { grid-template-columns: 1fr; text-align: center; }
+  .service-cards-grid { grid-template-columns: 1fr; }
   .form-grid { grid-template-columns: 1fr; }
   .form-group.full-width { grid-column: span 1; }
   .product-includes ul { grid-template-columns: 1fr; }

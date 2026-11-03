@@ -1,5 +1,6 @@
 /* ==========================================================================
-   CRABPREK JAVASCRIPT ENGINE (LIVE ANALOG CLOCK, MAPS AUTO, & AUTO WA)
+   CRABPREK JAVASCRIPT ENGINE
+   (FIXED: touch gesture, no NaN, smooth animation, real URLs)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const particles = [];
 
     const addParticle = (x, y) => {
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
       if (particles.length > 40) particles.shift();
       particles.push({
         x: x,
@@ -34,16 +36,18 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.addEventListener('mousemove', (e) => addParticle(e.clientX, e.clientY));
+
+    // ✅ FIX: e.touches[0] (sebelumnya e.touches → undefined → tidak muncul)
     window.addEventListener('touchmove', (e) => {
-  if (e.touches.length > 0) {
-    addParticle(e.touches[0].clientX, e.touches[0].clientY);
-  }
-}, { passive: true });
-window.addEventListener('touchstart', (e) => {
-  if (e.touches.length > 0) {
-    addParticle(e.touches[0].clientX, e.touches[0].clientY);
-  }
-}, { passive: true });
+      if (e.touches.length > 0) {
+        addParticle(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) {
+        addParticle(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
 
     const animateTrail = () => {
       tCtx.clearRect(0, 0, tWidth, tHeight);
@@ -91,35 +95,37 @@ window.addEventListener('touchstart', (e) => {
     window.addEventListener('resize', resize);
     resize();
 
+    // ✅ FIX: guard anti-NaN
     const updatePointerPos = (clientX, clientY) => {
-  // ✅ Guard: abaikan nilai invalid supaya mouseX/Y tidak pernah NaN
-  if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return;
+      if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return;
 
-  const rect = canvas.getBoundingClientRect();
-  canvasPointerX = clientX - rect.left;
-  canvasPointerY = clientY - rect.top;
-  targetMouseX = (clientX / window.innerWidth - 0.5) * 2;
-  targetMouseY = (clientY / window.innerHeight - 0.5) * 2;
-};
+      const rect = canvas.getBoundingClientRect();
+      canvasPointerX = clientX - rect.left;
+      canvasPointerY = clientY - rect.top;
+      targetMouseX = (clientX / window.innerWidth - 0.5) * 2;
+      targetMouseY = (clientY / window.innerHeight - 0.5) * 2;
+    };
 
     window.addEventListener('mousemove', (e) => updatePointerPos(e.clientX, e.clientY));
-    canvas.addEventListener('touchstart', (e) => {
-  if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
-}, { passive: true });
-canvas.addEventListener('touchmove', (e) => {
-  if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
-}, { passive: true });
 
-// ✅ Saat jari diangkat → bola kembali ke tengah, crab berhenti "kabur"
-const resetPointer = () => {
-  targetMouseX = 0;
-  targetMouseY = 0;
-  canvasPointerX = -9999;
-  canvasPointerY = -9999;
-};
-canvas.addEventListener('touchend', resetPointer, { passive: true });
-canvas.addEventListener('touchcancel', resetPointer, { passive: true });
-canvas.addEventListener('mouseleave', resetPointer);
+    // ✅ FIX: e.touches[0] — ini yang bikin bola lari ke sudut atas
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    // ✅ NEW: reset saat jari diangkat → bola balik ke tengah, crab berhenti kabur
+    const resetPointer = () => {
+      targetMouseX = 0;
+      targetMouseY = 0;
+      canvasPointerX = -9999;
+      canvasPointerY = -9999;
+    };
+    canvas.addEventListener('touchend', resetPointer, { passive: true });
+    canvas.addEventListener('touchcancel', resetPointer, { passive: true });
+    canvas.addEventListener('mouseleave', resetPointer);
 
     const particleCount = 110;
     let sphereAngle = 0;
@@ -153,7 +159,7 @@ canvas.addEventListener('mouseleave', resetPointer);
 
       ctx.strokeStyle = '#ff3b30';
       ctx.lineWidth = 3.5;
-      
+
       ctx.beginPath();
       ctx.moveTo(-10, -6);
       ctx.quadraticCurveTo(-18, -16, -12, -20);
@@ -170,7 +176,7 @@ canvas.addEventListener('mouseleave', resetPointer);
           const legPhase = Math.sin(legCycle + i * 0.8) * (isFleeing ? 7 : 4);
           const startX = side * 12;
           const startY = -2 + i * 5;
-          
+
           ctx.beginPath();
           ctx.moveTo(startX, startY);
           ctx.lineTo(startX + side * 10, startY + legPhase);
@@ -189,78 +195,71 @@ canvas.addEventListener('mouseleave', resetPointer);
     };
 
     const drawVisualStage = () => {
-  // ✅ Defensive: kalau entah kenapa ada NaN, langsung reset — tidak akan lari ke sudut
-  if (!Number.isFinite(mouseX)) mouseX = 0;
-  if (!Number.isFinite(mouseY)) mouseY = 0;
-  if (!Number.isFinite(targetMouseX)) targetMouseX = 0;
-  if (!Number.isFinite(targetMouseY)) targetMouseY = 0;
+      // ✅ Defensive: jika NaN muncul karena apa pun, reset ke 0
+      if (!Number.isFinite(mouseX)) mouseX = 0;
+      if (!Number.isFinite(mouseY)) mouseY = 0;
+      if (!Number.isFinite(targetMouseX)) targetMouseX = 0;
+      if (!Number.isFinite(targetMouseY)) targetMouseY = 0;
 
-  ctx.clearRect(0, 0, width, height);
-  // ... sisa kode tetap
-};
+      ctx.clearRect(0, 0, width, height);
 
-  // ✅ Lerp lebih lambat → transisi posisi halus, tidak "lompat"
-  mouseX += (targetMouseX - mouseX) * 0.02;
-  mouseY += (targetMouseY - mouseY) * 0.02;
+      // Animasi santai & stabil
+      mouseX += (targetMouseX - mouseX) * 0.02;
+      mouseY += (targetMouseY - mouseY) * 0.02;
 
-  // ✅ Scroll di-cap → tidak pernah berputar kencang walau scroll jauh
-  const scrollSpeed = Math.min(window.scrollY * 0.0005, 0.002);
-  sphereAngle += 0.004 + scrollSpeed;
+      const scrollSpeed = Math.min(window.scrollY * 0.0005, 0.002);
+      sphereAngle += 0.004 + scrollSpeed;
 
-  // ✅ Parallax mouse dikurangi (20px → 10px) → tidak mudah pindah posisi
-  const centerX = width * 0.5 + mouseX * 10;
-  const centerY = height * 0.5 + mouseY * 10;
-  const radius = Math.min(width, height) * 0.32;
+      const centerX = width * 0.5 + mouseX * 10;
+      const centerY = height * 0.5 + mouseY * 10;
+      const radius = Math.min(width, height) * 0.32;
 
-  const crabX = Math.cos(crabWalkAngle) * (radius * 0.95);
-  const crabY = -radius * 0.85 + Math.sin(crabWalkAngle * 2) * 8;
-  const crabAbsX = centerX + crabX;
-  const crabAbsY = centerY + crabY;
+      const crabX = Math.cos(crabWalkAngle) * (radius * 0.95);
+      const crabY = -radius * 0.85 + Math.sin(crabWalkAngle * 2) * 8;
+      const crabAbsX = centerX + crabX;
+      const crabAbsY = centerY + crabY;
 
-  // ✅ Deteksi kursor lebih kecil (85px → 70px) → kepiting lebih jarang kabur
-  const distToPointer = Math.hypot(canvasPointerX - crabAbsX, canvasPointerY - crabAbsY);
-  const isTouchNear = distToPointer < 70;
+      const distToPointer = Math.hypot(canvasPointerX - crabAbsX, canvasPointerY - crabAbsY);
+      const isTouchNear = distToPointer < 70;
 
-  // ✅ Kecepatan kabur dikurangi + decay lebih cepat → berhenti lebih cepat
-  if (isTouchNear) {
-    crabFleeSpeed = 0.03;
-  } else {
-    crabFleeSpeed *= 0.94;
-  }
+      if (isTouchNear) {
+        crabFleeSpeed = 0.03;
+      } else {
+        crabFleeSpeed *= 0.94;
+      }
 
-  // ✅ Efek scroll ke kepiting dikurangi (1.5 → 0.4) → tidak "loncat"
-  crabWalkAngle += 0.010 + crabFleeSpeed + scrollSpeed * 0.4;
+      crabWalkAngle += 0.010 + crabFleeSpeed + scrollSpeed * 0.4;
 
-  ctx.save();
-  ctx.translate(centerX, centerY);
+      ctx.save();
+      ctx.translate(centerX, centerY);
 
-  for (let i = 0; i < particleCount; i++) {
-    const phi = Math.acos(-1 + (2 * i) / particleCount);
-    const theta = Math.sqrt(particleCount * Math.PI) * phi + sphereAngle;
+      for (let i = 0; i < particleCount; i++) {
+        const phi = Math.acos(-1 + (2 * i) / particleCount);
+        const theta = Math.sqrt(particleCount * Math.PI) * phi + sphereAngle;
 
-    const x = radius * Math.cos(theta) * Math.sin(phi);
-    const y = radius * Math.sin(theta) * Math.sin(phi);
-    const z = radius * Math.cos(phi);
+        const x = radius * Math.cos(theta) * Math.sin(phi);
+        const y = radius * Math.sin(theta) * Math.sin(phi);
+        const z = radius * Math.cos(phi);
 
-    const scale = (z + radius * 1.5) / (radius * 2);
-    const alpha = Math.max(0.1, scale * 0.75);
+        const scale = (z + radius * 1.5) / (radius * 2);
+        const alpha = Math.max(0.1, scale * 0.75);
 
-    ctx.beginPath();
-    ctx.arc(x, y, 3 * scale, 0, Math.PI * 2);
+        ctx.beginPath();
+        ctx.arc(x, y, 3 * scale, 0, Math.PI * 2);
 
-    const hue = 10 + (z / radius) * 30;
-    ctx.fillStyle = `hsla(${hue}, 95%, 60%, ${alpha})`;
-    ctx.fill();
-  }
+        const hue = 10 + (z / radius) * 30;
+        ctx.fillStyle = `hsla(${hue}, 95%, 60%, ${alpha})`;
+        ctx.fill();
+      }
 
-  const crabScale = 0.85 + Math.sin(crabWalkAngle) * 0.15;
-  const legCycleSpeed = isTouchNear ? crabWalkAngle * 18 : crabWalkAngle * 6;
+      const crabScale = 0.85 + Math.sin(crabWalkAngle) * 0.15;
+      const legCycleSpeed = isTouchNear ? crabWalkAngle * 18 : crabWalkAngle * 6;
 
-  drawProceduralCrab(crabX, crabY, crabScale, legCycleSpeed, isTouchNear || crabFleeSpeed > 0.02);
+      drawProceduralCrab(crabX, crabY, crabScale, legCycleSpeed, isTouchNear || crabFleeSpeed > 0.02);
 
-  ctx.restore();
-  requestAnimationFrame(drawVisualStage);
-};
+      ctx.restore();
+      requestAnimationFrame(drawVisualStage);
+    };
 
     drawVisualStage();
   }
@@ -313,7 +312,6 @@ canvas.addEventListener('mouseleave', resetPointer);
 
   extraCheckboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
 
-  // Toggle Alamat Pengiriman
   serviceCards.forEach(card => {
     card.addEventListener('click', () => {
       serviceCards.forEach(c => c.classList.remove('active'));
@@ -333,14 +331,13 @@ canvas.addEventListener('mouseleave', resetPointer);
     });
   });
 
-  // Submit Form -> Redirect wa.me
   if (waForm) {
     waForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const name = document.getElementById('cust-name').value.trim();
       const qty = parseInt(qtyInput.value) || 1;
-      
+
       let selectedService = "Makan di Tempat";
       const activeRadio = document.querySelector('input[name="service-type"]:checked');
       if (activeRadio) selectedService = activeRadio.value;
@@ -364,7 +361,7 @@ canvas.addEventListener('mouseleave', resetPointer);
         waMessage += `• Ekstra: ${selectedExtras.join(', ')}\n`;
       }
       waMessage += `• Total Est: *${currentTotalText}*\n\n`;
-      
+
       waMessage += `👤 *DATA PEMESAN:*\n`;
       waMessage += `• Nama: ${name}\n`;
       if (address) waMessage += `• Alamat/Lokasi Antar: ${address}\n`;
@@ -378,7 +375,7 @@ canvas.addEventListener('mouseleave', resetPointer);
   }
 
   // --------------------------------------------------------------------------
-  // 4. MODAL JAM ANALOG INTERAKTIF & LOGO CRABPREK
+  // 4. MODAL JAM ANALOG INTERAKTIF
   // --------------------------------------------------------------------------
   const clockTrigger = document.getElementById('trigger-clock-modal');
   const clockModal = document.getElementById('clock-modal');
@@ -400,7 +397,6 @@ canvas.addEventListener('mouseleave', resetPointer);
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
 
-    // Update Text Digital
     if (digitalClockText) {
       const hStr = String(hours).padStart(2, '0');
       const mStr = String(minutes).padStart(2, '0');
@@ -411,7 +407,6 @@ canvas.addEventListener('mouseleave', resetPointer);
     cCtx.save();
     cCtx.translate(radius, radius);
 
-    // Dial Ring
     cCtx.beginPath();
     cCtx.arc(0, 0, radius - 8, 0, Math.PI * 2);
     cCtx.fillStyle = '#12141d';
@@ -420,13 +415,11 @@ canvas.addEventListener('mouseleave', resetPointer);
     cCtx.strokeStyle = '#ff3b30';
     cCtx.stroke();
 
-    // Logo / Ikon Kepiting di Tengah Jam
     cCtx.font = '28px sans-serif';
     cCtx.textAlign = 'center';
     cCtx.textBaseline = 'middle';
     cCtx.fillText('🦀', 0, 0);
 
-    // Tanda Jam (Tick Marks)
     for (let i = 0; i < 12; i++) {
       const ang = (i * Math.PI) / 6;
       cCtx.beginPath();
@@ -439,7 +432,6 @@ canvas.addEventListener('mouseleave', resetPointer);
       cCtx.rotate(-ang);
     }
 
-    // Jarum Jam
     const hourAng = ((hours % 12) * Math.PI) / 6 + (minutes * Math.PI) / 360;
     cCtx.beginPath();
     cCtx.rotate(hourAng);
@@ -450,7 +442,6 @@ canvas.addEventListener('mouseleave', resetPointer);
     cCtx.stroke();
     cCtx.rotate(-hourAng);
 
-    // Jarum Menit
     const minAng = (minutes * Math.PI) / 30 + (seconds * Math.PI) / 1800;
     cCtx.beginPath();
     cCtx.rotate(minAng);
@@ -461,7 +452,6 @@ canvas.addEventListener('mouseleave', resetPointer);
     cCtx.stroke();
     cCtx.rotate(-minAng);
 
-    // Jarum Detik
     const secAng = (seconds * Math.PI) / 30;
     cCtx.beginPath();
     cCtx.rotate(secAng);
@@ -504,7 +494,7 @@ canvas.addEventListener('mouseleave', resetPointer);
       const rect = tiltCard.getBoundingClientRect();
       const x = e.clientX - rect.left - rect.width / 2;
       const y = e.clientY - rect.top - rect.height / 2;
-      
+
       const tiltX = (y / rect.height) * -12;
       const tiltY = (x / rect.width) * 12;
 

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CRABPREK JAVASCRIPT ENGINE (AUTO WA REDIRECT, CONDITIONAL ADDRESS, & TRAIL)
+   CRABPREK JAVASCRIPT ENGINE (LIVE ANALOG CLOCK, MAPS AUTO, & AUTO WA)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 2. CANVAS 3D ENGINE (BOLA & KEPITING INTERAKTIF)
+  // 2. HERO CANVAS 3D ENGINE (BOLA & KEPITING INTERAKTIF)
   // --------------------------------------------------------------------------
   const canvas = document.getElementById('hero-canvas');
   if (canvas) {
@@ -96,17 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.addEventListener('mousemove', (e) => updatePointerPos(e.clientX, e.clientY));
-    
     canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 0) {
-        updatePointerPos(e.touches.clientX, e.touches.clientY);
-      }
+      if (e.touches.length > 0) updatePointerPos(e.touches.clientX, e.touches.clientY);
     }, { passive: true });
-
     canvas.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) {
-        updatePointerPos(e.touches.clientX, e.touches.clientY);
-      }
+      if (e.touches.length > 0) updatePointerPos(e.touches.clientX, e.touches.clientY);
     }, { passive: true });
 
     const particleCount = 110;
@@ -240,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 3. FORM PEMESANAN INTERAKTIF & LOGIKA HIDE/SHOW ALAMAT
+  // 3. FORM PEMESANAN INTERAKTIF & HARGA EKSTRA REVISI
   // --------------------------------------------------------------------------
   const qtyInput = document.getElementById('cust-qty');
   const btnMinus = document.getElementById('btn-qty-minus');
@@ -287,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   extraCheckboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
 
-  // TOGGLE ALAMAT PENGIRIMAN DENGAN ANIMASI MULUS
+  // Toggle Alamat Pengiriman
   serviceCards.forEach(card => {
     card.addEventListener('click', () => {
       serviceCards.forEach(c => c.classList.remove('active'));
@@ -307,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // SUBMIT FORM -> WA DIRECT REDIRECT (+62 823-6212-9646)
+  // Submit Form -> Redirect wa.me
   if (waForm) {
     waForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -329,7 +323,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let currentTotalText = livePriceEl ? livePriceEl.textContent : `Rp ${(qty * BASE_PRICE).toLocaleString('id-ID')}`;
 
-      // Draf Pesan WA Rapi
       let waMessage = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
       waMessage += `📋 *DETAIL PESANAN:*\n`;
       waMessage += `• Menu Utama: *Crabprek Sambel Geprek*\n`;
@@ -347,17 +340,131 @@ document.addEventListener('DOMContentLoaded', () => {
 
       waMessage += `\nMohon diproses ya kak. Terima kasih! 🦀🔥`;
 
-      const waNumber = '6282362129646';
-      const encodedMsg = encodeURIComponent(waMessage);
-      const waUrl = `[suspicious link removed]{waNumber}?text=${encodedMsg}`;
-
-      // Direct Redirect 100% tanpa terblokir popup blocker
+      const waUrl = `[suspicious link removed]{encodeURIComponent(waMessage)}`;
       window.location.href = waUrl;
     });
   }
 
   // --------------------------------------------------------------------------
-  // 4. PARALLAX 3D TILT ON HOVER
+  // 4. MODAL JAM ANALOG INTERAKTIF & LOGO CRABPREK
+  // --------------------------------------------------------------------------
+  const clockTrigger = document.getElementById('trigger-clock-modal');
+  const clockModal = document.getElementById('clock-modal');
+  const btnCloseClock = document.getElementById('btn-close-clock');
+  const clockCanvas = document.getElementById('analog-clock-canvas');
+  const digitalClockText = document.getElementById('digital-clock-text');
+
+  let clockInterval = null;
+
+  const drawAnalogClock = () => {
+    if (!clockCanvas) return;
+    const cCtx = clockCanvas.getContext('2d');
+    const radius = clockCanvas.width / 2;
+
+    cCtx.clearRect(0, 0, clockCanvas.width, clockCanvas.height);
+
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Update Text Digital
+    if (digitalClockText) {
+      const hStr = String(hours).padStart(2, '0');
+      const mStr = String(minutes).padStart(2, '0');
+      const sStr = String(seconds).padStart(2, '0');
+      digitalClockText.textContent = `${hStr}:${mStr}:${sStr} WIB`;
+    }
+
+    cCtx.save();
+    cCtx.translate(radius, radius);
+
+    // Dial Ring
+    cCtx.beginPath();
+    cCtx.arc(0, 0, radius - 8, 0, Math.PI * 2);
+    cCtx.fillStyle = '#12141d';
+    cCtx.fill();
+    cCtx.lineWidth = 4;
+    cCtx.strokeStyle = '#ff3b30';
+    cCtx.stroke();
+
+    // Logo / Ikon Kepiting di Tengah Jam
+    cCtx.font = '28px sans-serif';
+    cCtx.textAlign = 'center';
+    cCtx.textBaseline = 'middle';
+    cCtx.fillText('🦀', 0, 0);
+
+    // Tanda Jam (Tick Marks)
+    for (let i = 0; i < 12; i++) {
+      const ang = (i * Math.PI) / 6;
+      cCtx.beginPath();
+      cCtx.rotate(ang);
+      cCtx.moveTo(0, -(radius - 20));
+      cCtx.lineTo(0, -(radius - 12));
+      cCtx.strokeStyle = '#ffb703';
+      cCtx.lineWidth = 3;
+      cCtx.stroke();
+      cCtx.rotate(-ang);
+    }
+
+    // Jarum Jam
+    const hourAng = ((hours % 12) * Math.PI) / 6 + (minutes * Math.PI) / 360;
+    cCtx.beginPath();
+    cCtx.rotate(hourAng);
+    cCtx.moveTo(0, 0);
+    cCtx.lineTo(0, -(radius * 0.5));
+    cCtx.strokeStyle = '#f8fafc';
+    cCtx.lineWidth = 5;
+    cCtx.stroke();
+    cCtx.rotate(-hourAng);
+
+    // Jarum Menit
+    const minAng = (minutes * Math.PI) / 30 + (seconds * Math.PI) / 1800;
+    cCtx.beginPath();
+    cCtx.rotate(minAng);
+    cCtx.moveTo(0, 0);
+    cCtx.lineTo(0, -(radius * 0.7));
+    cCtx.strokeStyle = '#ffb703';
+    cCtx.lineWidth = 3;
+    cCtx.stroke();
+    cCtx.rotate(-minAng);
+
+    // Jarum Detik
+    const secAng = (seconds * Math.PI) / 30;
+    cCtx.beginPath();
+    cCtx.rotate(secAng);
+    cCtx.moveTo(0, 10);
+    cCtx.lineTo(0, -(radius * 0.82));
+    cCtx.strokeStyle = '#ff3b30';
+    cCtx.lineWidth = 2;
+    cCtx.stroke();
+    cCtx.rotate(-secAng);
+
+    cCtx.restore();
+  };
+
+  if (clockTrigger && clockModal) {
+    clockTrigger.addEventListener('click', () => {
+      clockModal.classList.add('active');
+      drawAnalogClock();
+      clockInterval = setInterval(drawAnalogClock, 1000);
+    });
+
+    btnCloseClock.addEventListener('click', () => {
+      clockModal.classList.remove('active');
+      if (clockInterval) clearInterval(clockInterval);
+    });
+
+    clockModal.addEventListener('click', (e) => {
+      if (e.target === clockModal) {
+        clockModal.classList.remove('active');
+        if (clockInterval) clearInterval(clockInterval);
+      }
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. PARALLAX 3D TILT ON HOVER
   // --------------------------------------------------------------------------
   const tiltCard = document.querySelector('.tilt-card');
   if (tiltCard) {
@@ -378,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 5. NAVBAR SCROLL SHIFT & SCROLL REVEAL OBSERVER
+  // 6. NAVBAR SCROLL SHIFT & SCROLL REVEAL OBSERVER
   // --------------------------------------------------------------------------
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {

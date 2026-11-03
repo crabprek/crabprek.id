@@ -35,10 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('mousemove', (e) => addParticle(e.clientX, e.clientY));
     window.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) {
-        addParticle(e.touches.clientX, e.touches.clientY);
-      }
-    }, { passive: true });
+  if (e.touches.length > 0) {
+    addParticle(e.touches[0].clientX, e.touches[0].clientY);
+  }
+}, { passive: true });
+window.addEventListener('touchstart', (e) => {
+  if (e.touches.length > 0) {
+    addParticle(e.touches[0].clientX, e.touches[0].clientY);
+  }
+}, { passive: true });
 
     const animateTrail = () => {
       tCtx.clearRect(0, 0, tWidth, tHeight);
@@ -87,21 +92,34 @@ document.addEventListener('DOMContentLoaded', () => {
     resize();
 
     const updatePointerPos = (clientX, clientY) => {
-      const rect = canvas.getBoundingClientRect();
-      canvasPointerX = clientX - rect.left;
-      canvasPointerY = clientY - rect.top;
+  // ✅ Guard: abaikan nilai invalid supaya mouseX/Y tidak pernah NaN
+  if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return;
 
-      targetMouseX = (clientX / window.innerWidth - 0.5) * 2;
-      targetMouseY = (clientY / window.innerHeight - 0.5) * 2;
-    };
+  const rect = canvas.getBoundingClientRect();
+  canvasPointerX = clientX - rect.left;
+  canvasPointerY = clientY - rect.top;
+  targetMouseX = (clientX / window.innerWidth - 0.5) * 2;
+  targetMouseY = (clientY / window.innerHeight - 0.5) * 2;
+};
 
     window.addEventListener('mousemove', (e) => updatePointerPos(e.clientX, e.clientY));
     canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 0) updatePointerPos(e.touches.clientX, e.touches.clientY);
-    }, { passive: true });
-    canvas.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) updatePointerPos(e.touches.clientX, e.touches.clientY);
-    }, { passive: true });
+  if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+canvas.addEventListener('touchmove', (e) => {
+  if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive: true });
+
+// ✅ Saat jari diangkat → bola kembali ke tengah, crab berhenti "kabur"
+const resetPointer = () => {
+  targetMouseX = 0;
+  targetMouseY = 0;
+  canvasPointerX = -9999;
+  canvasPointerY = -9999;
+};
+canvas.addEventListener('touchend', resetPointer, { passive: true });
+canvas.addEventListener('touchcancel', resetPointer, { passive: true });
+canvas.addEventListener('mouseleave', resetPointer);
 
     const particleCount = 110;
     let sphereAngle = 0;
@@ -171,7 +189,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const drawVisualStage = () => {
+  // ✅ Defensive: kalau entah kenapa ada NaN, langsung reset — tidak akan lari ke sudut
+  if (!Number.isFinite(mouseX)) mouseX = 0;
+  if (!Number.isFinite(mouseY)) mouseY = 0;
+  if (!Number.isFinite(targetMouseX)) targetMouseX = 0;
+  if (!Number.isFinite(targetMouseY)) targetMouseY = 0;
+
   ctx.clearRect(0, 0, width, height);
+  // ... sisa kode tetap
+};
 
   // ✅ Lerp lebih lambat → transisi posisi halus, tidak "lompat"
   mouseX += (targetMouseX - mouseX) * 0.02;

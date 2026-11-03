@@ -15,18 +15,19 @@
   <!-- Navbar Glassmorphism -->
   <header class="navbar" id="navbar">
     <a href="#" class="logo">
-      <!-- Slot Logo Crabprek -->
-      <img src="logo.png" alt="Logo CRABPREK" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
-      <span class="logo-fallback-icon">🦀</span>
+      <div class="logo-wrapper">
+        <img src="logo.png" alt="Logo CRABPREK" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+        <span class="logo-fallback-icon">🦀</span>
+      </div>
       <span class="logo-text">CRAB<span>PREK</span></span>
     </a>
     <nav class="nav-links">
       <a href="#hero">Beranda</a>
       <a href="#product">Menu Utama</a>
-      <a href="#features">Keunggulan</a>
+      <a href="#order-form">Pesan Langsung</a>
       <a href="#info">Lokasi & Jam</a>
     </nav>
-    <a href="[suspicious link removed]" target="_blank" class="btn-nav">Pesan WA 💬</a>
+    <a href="#order-form" class="btn-nav">Pesan Sekarang 🛒</a>
   </header>
 
   <!-- Hero Section -->
@@ -42,11 +43,11 @@
           <span class="gradient-text">Padehnyo Mupakaiak!</span>
         </h1>
         <p class="hero-subtitle">
-          Satu-satunya kepiting renyah porsi pas di Payakumbuh yang bisa dimakan langsung tanpa ribet kupas cangkang! Digeprek dengan Sambal Geprek khas racikan Crabprek, disajikan hangat bareng Nasi Putih, Tahu, Tempe, & Lalapan.
+          Satu-satunyo kepiting renyah porsi pas (ukuran 4 jari tangan) di Payakumbuh yang biso dimakan lansung tanpa ribet kupas cangkang! Digeprek jo Sambal Geprek khas racikan Crabprek, disajikan hangat bareng Nasi Putih, Tahu, Tempe, & Lalapan.
         </p>
 
         <div class="hero-buttons">
-          <a href="[suspicious link removed]" target="_blank" class="btn btn-primary">Pesan via WhatsApp (Rp 18.000) 📱</a>
+          <a href="#order-form" class="btn btn-primary">Pesan Online Langsung (Rp 18.000) 📱</a>
           <a href="#info" class="btn btn-outline">Lokasi Taman Batang Agam</a>
         </div>
 
@@ -58,24 +59,24 @@
           <div class="stat-divider"></div>
           <div class="stat-box">
             <span class="stat-number">100% Utuh</span>
-            <span class="stat-label">Bisa Dimakan Sadonyo</span>
+            <span class="stat-label">Biso Dimakan Cangkangnyo</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-box">
-            <span class="stat-number">Level 1 - 10</span>
-            <span class="stat-label">Pedas Sambal Geprek</span>
+            <span class="stat-number">Sambal Geprek</span>
+            <span class="stat-label">Racikan Khas Crabprek</span>
           </div>
         </div>
       </div>
 
-      <!-- Hero Visual Canvas 3D (Bola Berputar + Kepiting Merangkak) -->
+      <!-- Hero Visual Stage (Canvas Interactive + Scroll Driven) -->
       <div class="hero-visual-stage">
         <canvas id="hero-canvas"></canvas>
         <div class="floating-card badge-top">
-          <span class="badge-icon">🔥</span>
+          <span class="badge-icon">💨</span>
           <div>
-            <strong>Sambal Geprek Asli</strong>
-            <small>Diulek Fresh Khas Crabprek</small>
+            <strong>Interactive Visuals</strong>
+            <small>Coba Touch / Scroll Layar!</small>
           </div>
         </div>
         <div class="floating-card badge-bottom">
@@ -94,13 +95,12 @@
     <div class="section-header">
       <span class="section-tag">MENU MASTERPIECE KEBANGGAAN</span>
       <h2>Racikan Utama <span class="gradient-text">Yang Bikin Nagih</span></h2>
-      <p>Menu ikonik pilihan utama pecinta seafood pedas di Payakumbuh.</p>
+      <p>Menu ikonik pilihan utama pecinta kuliner seafood pedas di Payakumbuh.</p>
     </div>
 
     <div class="product-showcase reveal">
       <div class="product-media-box">
         <div class="product-badge-glow">BEST SELLER</div>
-        <!-- Slot Foto Produk Varian Crabprek Sambel Geprek -->
         <img src="crabprek-sambel-geprek.jpg" alt="Crabprek Sambel Geprek" class="product-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
         <div class="product-media-fallback">
           <span class="fallback-icon">🦀🌶️</span>
@@ -110,15 +110,15 @@
         <span class="product-category">AUTHENTIC CRAFTED RECIPE</span>
         <h3>Crabprek Sambel Geprek</h3>
         <p class="product-desc">
-          Kepiting olahan segar pilihan yang digoreng garing keemasan hingga cangkangnya renyah empuk, lalu digeprek dengan ulekan **Sambal Geprek khas Crabprek** yang gurih dan pedas mantap.
+          Kepiting olahan segar pilihan (ukuran 4 jari tangan) yang digoreng garing keemasan hingga cangkangnya renyah empuk, lalu digeprek melimpah dengan ulekan **Sambal Geprek khas Crabprek** yang gurih dan pedas mantap.
         </p>
 
         <div class="product-includes">
           <strong>Isian Paket Lengkap:</strong>
           <ul>
-            <li>🦀 Kepiting Renyah Utuh</li>
+            <li>🦀 Kepiting Renyah Utuh (Ukuran 4 Jari)</li>
             <li>🍚 Nasi Putih Hangat</li>
-            <li>🔥 Sambal Geprek Khas</li>
+            <li>🔥 Sambal Geprek Khas Crabprek</li>
             <li>🧈 Tahu & Tempe Goreng + Lalapan Segar</li>
           </ul>
         </div>
@@ -128,35 +128,71 @@
             <small>Harga Porsi Lengkap</small>
             <strong>Rp 18.000</strong>
           </div>
-          <a href="[suspicious link removed]" target="_blank" class="btn btn-primary">Pesan via WA (+62 823-6212-9646) 💬</a>
+          <a href="#order-form" class="btn btn-primary">Isi Form Pesanan 🛒</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Features Section -->
-  <section id="features" class="section">
-    <div class="section-header">
-      <span class="section-tag">ALASAN HARUS COBA</span>
-      <h2>Keunggulan <span class="gradient-text">CRABPREK</span></h2>
-    </div>
+  <!-- Order Form Section (Pemesanan Otomatis ke WA tanpa Level Pedas) -->
+  <section id="order-form" class="section">
+    <div class="order-card-wrapper reveal">
+      <div class="section-header">
+        <span class="section-tag">PEMESANAN ONLINE INSTAN</span>
+        <h2>Formulir Pesanan <span class="gradient-text">CRABPREK</span></h2>
+        <p>Isi detail pesanan Anda di bawah ini, lalu klik tombol untuk langsung terhubung ke WhatsApp resmi kami.</p>
+      </div>
 
-    <div class="features-grid reveal">
-      <div class="feature-item">
-        <div class="f-icon">🦀</div>
-        <h3>Makan Utuh Tanpa Ribet</h3>
-        <p>Kepiting dengan tekstur garing renyah empuk dan gurih, bisa dimakan lansung tanpa perlu repot mengupas.</p>
-      </div>
-      <div class="feature-item">
-        <div class="f-icon">🌶️</div>
-        <h3>Sambal Geprek Khas Diguok Fresh</h3>
-        <p>Racikan Sambal Geprek asli khas Crabprek yang diulek fresh dengan rasa pedas yang cocok di lidah Urang Awak.</p>
-      </div>
-      <div class="feature-item">
-        <div class="f-icon">🍋</div>
-        <h3>Gurih Meresap & Bebas Amis</h3>
-        <p>Diolah dengan teknik pembersihan dan perendaman bumbu rempah pilihan, menghasilkan daging kepiting yang gurih, juicy, dan segar.</p>
-      </div>
+      <form id="wa-order-form" class="order-form">
+        <div class="form-grid">
+          
+          <!-- Nama Pemesan -->
+          <div class="form-group">
+            <label for="cust-name">Nama Pemesan / Pembeli *</label>
+            <input type="text" id="cust-name" placeholder="Masukkan nama Anda..." required />
+          </div>
+
+          <!-- Jumlah Porsi -->
+          <div class="form-group">
+            <label for="cust-qty">Jumlah Porsi (Rp 18.000/porsi) *</label>
+            <input type="number" id="cust-qty" min="1" max="50" value="1" required />
+          </div>
+
+          <!-- Tipe Layanan -->
+          <div class="form-group full-width">
+            <label for="cust-service">Jenis Pesanan *</label>
+            <select id="cust-service">
+              <option value="Dine-in / Makan di Stand Taman Batang Agam">Makan di Tempat (Stand Batang Agam)</option>
+              <option value="Bungkus / Takeaway di Stand">Bungkus / Takeaway (Stand Batang Agam)</option>
+              <option value="Pesan Antar / Delivery Payakumbuh">Pesan Antar (Delivery Area Payakumbuh)</option>
+            </select>
+          </div>
+
+          <!-- Alamat Pengiriman -->
+          <div class="form-group full-width">
+            <label for="cust-address">Alamat Pengiriman / Lokasi Antar (Jika Delivery)</label>
+            <input type="text" id="cust-address" placeholder="Contoh: Jl. Sudirman No. 12, dekat Masjid Agung..." />
+          </div>
+
+          <!-- Catatan Tambahan -->
+          <div class="form-group full-width">
+            <label for="cust-note">Catatan Khusus (Opsional)</label>
+            <textarea id="cust-note" rows="2" placeholder="Contoh: Sambal dipisah, tahu diganti tempe, dll..."></textarea>
+          </div>
+
+        </div>
+
+        <!-- Live Price Calculator Summary -->
+        <div class="order-summary-box">
+          <div class="summary-text">
+            <span>Total Pembayaran:</span>
+            <strong id="live-total-price">Rp 18.000</strong>
+          </div>
+          <button type="submit" class="btn btn-primary btn-large btn-submit-wa">
+            Kirim Pesanan ke WhatsApp 💬
+          </button>
+        </div>
+      </form>
     </div>
   </section>
 
@@ -190,10 +226,6 @@
           <h3>Metode Pembayaran</h3>
           <p>Tunai (Cash) & QRIS<br /><em>(Praktis & Bebas Ribet)</em></p>
         </div>
-      </div>
-
-      <div class="action-wrap">
-        <a href="[suspicious link removed]" target="_blank" class="btn btn-primary btn-large">Hubungi WA +62 823-6212-9646 📱</a>
       </div>
     </div>
 

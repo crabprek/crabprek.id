@@ -28,7 +28,6 @@ html {
   overflow-x: hidden;
 }
 
-/* Custom Cursor Trail Canvas */
 #trail-canvas {
   position: fixed;
   top: 0;
@@ -64,7 +63,7 @@ html {
   background: radial-gradient(circle, var(--accent-orange), transparent 70%);
 }
 
-/* Navbar Logo Customization */
+/* Navbar */
 .navbar {
   position: fixed;
   top: 0;
@@ -356,7 +355,7 @@ html {
   line-height: 1.6;
 }
 
-/* Tilt Product Showcase */
+/* Product Showcase */
 .product-showcase {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
@@ -484,7 +483,7 @@ html {
   font-weight: 800;
 }
 
-/* Order Form Styling & Counter */
+/* Order Form Styling */
 .order-card-wrapper {
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
@@ -580,7 +579,7 @@ html {
   outline: none;
 }
 
-/* Service Type Cards (Radio Buttons) */
+/* Service Type Cards */
 .service-cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -725,9 +724,49 @@ html {
 
 .footer-left strong { display: block; font-size: 14px; }
 .footer-left span { font-size: 12px; color: var(--text-muted); }
-.footer-links { display: flex; gap: 20px; }
-.footer-links a { color: var(--text-muted); text-decoration: none; font-size: 13px; transition: color 0.3s; }
-.footer-links a:hover { color: var(--accent-gold); }
+
+/* Social Icons Styling */
+.footer-socials {
+  display: flex;
+  gap: 14px;
+}
+
+.social-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  transform: translateY(-3px);
+  color: #fff;
+}
+
+.social-icon.wa:hover {
+  background: #25d366;
+  border-color: #25d366;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+}
+
+.social-icon.ig:hover {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  border-color: #dc2743;
+  box-shadow: 0 4px 15px rgba(220, 39, 67, 0.4);
+}
+
+.social-icon.tiktok:hover {
+  background: #000;
+  border-color: var(--accent-red);
+  box-shadow: 0 4px 15px rgba(255, 59, 48, 0.4);
+}
 
 .reveal {
   opacity: 0;

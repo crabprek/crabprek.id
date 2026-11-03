@@ -1,11 +1,11 @@
 /* ==========================================================================
-   CRABPREK JAVASCRIPT ENGINE (SCATTERING CRAB, TRAIL & AUTO WA ORDER)
+   CRABPREK JAVASCRIPT ENGINE (AUTO WA REDIRECT, CONDITIONAL ADDRESS, & TRAIL)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
 
   // --------------------------------------------------------------------------
-  // 1. CUSTOM CURSOR TRAIL ENGINE (JEJAK BUMBU GLOWING BEBAS LAG)
+  // 1. CUSTOM CURSOR TRAIL ENGINE
   // --------------------------------------------------------------------------
   const trailCanvas = document.getElementById('trail-canvas');
   if (trailCanvas) {
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('mousemove', (e) => addParticle(e.clientX, e.clientY));
     window.addEventListener('touchmove', (e) => {
       if (e.touches.length > 0) {
-        addParticle(e.touches[0].clientX, e.touches[0].clientY);
+        addParticle(e.touches.clientX, e.touches.clientY);
       }
     }, { passive: true });
 
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 2. CANVAS 3D ENGINE (BOLA & KEPITING INTERAKTIF KABUR SAAT DI-TOUCH)
+  // 2. CANVAS 3D ENGINE (BOLA & KEPITING INTERAKTIF)
   // --------------------------------------------------------------------------
   const canvas = document.getElementById('hero-canvas');
   if (canvas) {
@@ -99,13 +99,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     canvas.addEventListener('touchstart', (e) => {
       if (e.touches.length > 0) {
-        updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+        updatePointerPos(e.touches.clientX, e.touches.clientY);
       }
     }, { passive: true });
 
     canvas.addEventListener('touchmove', (e) => {
       if (e.touches.length > 0) {
-        updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
+        updatePointerPos(e.touches.clientX, e.touches.clientY);
       }
     }, { passive: true });
 
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 3. FORM PEMESANAN INTERAKTIF & AUTO WA (+62 823-6212-9646)
+  // 3. FORM PEMESANAN INTERAKTIF & LOGIKA HIDE/SHOW ALAMAT
   // --------------------------------------------------------------------------
   const qtyInput = document.getElementById('cust-qty');
   const btnMinus = document.getElementById('btn-qty-minus');
@@ -249,6 +249,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const waForm = document.getElementById('wa-order-form');
   const serviceCards = document.querySelectorAll('.service-card');
   const extraCheckboxes = document.querySelectorAll('.extra-item');
+  const addressGroup = document.getElementById('address-field-group');
+  const addressInput = document.getElementById('cust-address');
 
   const BASE_PRICE = 18000;
 
@@ -285,17 +287,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   extraCheckboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
 
-  // Service Type Radio Toggle UI
+  // TOGGLE ALAMAT PENGIRIMAN DENGAN ANIMASI MULUS
   serviceCards.forEach(card => {
     card.addEventListener('click', () => {
       serviceCards.forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       const radio = card.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
+
+      const serviceType = card.getAttribute('data-service');
+      if (serviceType === 'delivery') {
+        addressGroup.style.display = 'flex';
+        addressInput.required = true;
+      } else {
+        addressGroup.style.display = 'none';
+        addressInput.required = false;
+        addressInput.value = '';
+      }
     });
   });
 
-  // Submit Form -> Auto Redirect WhatsApp (+62 823-6212-9646)
+  // SUBMIT FORM -> WA DIRECT REDIRECT (+62 823-6212-9646)
   if (waForm) {
     waForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -307,10 +319,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const activeRadio = document.querySelector('input[name="service-type"]:checked');
       if (activeRadio) selectedService = activeRadio.value;
 
-      const address = document.getElementById('cust-address').value.trim();
+      const address = addressInput.value.trim();
       const note = document.getElementById('cust-note').value.trim();
 
-      // Kumpulkan Ekstra
       let selectedExtras = [];
       extraCheckboxes.forEach(cb => {
         if (cb.checked) selectedExtras.push(cb.value);
@@ -318,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let currentTotalText = livePriceEl ? livePriceEl.textContent : `Rp ${(qty * BASE_PRICE).toLocaleString('id-ID')}`;
 
-      // Format Draf Pesan WA Rapi
+      // Draf Pesan WA Rapi
       let waMessage = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
       waMessage += `📋 *DETAIL PESANAN:*\n`;
       waMessage += `• Menu Utama: *Crabprek Sambel Geprek*\n`;
@@ -331,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
       waMessage += `👤 *DATA PEMESAN:*\n`;
       waMessage += `• Nama: ${name}\n`;
-      if (address) waMessage += `• Alamat/Lokasi: ${address}\n`;
+      if (address) waMessage += `• Alamat/Lokasi Antar: ${address}\n`;
       if (note) waMessage += `• Catatan: ${note}\n`;
 
       waMessage += `\nMohon diproses ya kak. Terima kasih! 🦀🔥`;
@@ -340,12 +351,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const encodedMsg = encodeURIComponent(waMessage);
       const waUrl = `[suspicious link removed]{waNumber}?text=${encodedMsg}`;
 
-      window.open(waUrl, '_blank');
+      // Direct Redirect 100% tanpa terblokir popup blocker
+      window.location.href = waUrl;
     });
   }
 
   // --------------------------------------------------------------------------
-  // 4. PARALLAX 3D TILT ON HOVER FOR PRODUCT SHOWCASE
+  // 4. PARALLAX 3D TILT ON HOVER
   // --------------------------------------------------------------------------
   const tiltCard = document.querySelector('.tilt-card');
   if (tiltCard) {

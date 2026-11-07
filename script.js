@@ -1,418 +1,394 @@
 /* ==========================================================================
-   CRABPREK — script.js
-   Hero canvas · form WhatsApp · jam analog · navigasi & kartu horizontal scroll
+   CRABPREK — Interactive Script
+   Fitur: form pesanan (WA), kalkulasi harga promo, horizontal scroll, jam
+   analog, scroll reveal, active nav.
    ========================================================================== */
+
 document.addEventListener('DOMContentLoaded', () => {
-  const $ = (id) => document.getElementById(id);
+  'use strict';
 
-  // --------------------------------------------------------------------------
-  // 1. HERO CANVAS (bola partikel + kepiting prosedural yang kabur dari sentuhan)
-  // --------------------------------------------------------------------------
-  const canvas = $('hero-canvas');
-  if (canvas) {
-    const ctx = canvas.getContext('2d');
-    const COUNT = 110;
-    let width = 0, height = 0;
-    let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
-    let px = -9999, py = -9999;
-    let sphereAngle = 0, crabAngle = 0, flee = 0;
+  /* === KONFIGURASI === */
+  const BASE_PRICE = 16000;   // Harga promo (digunakan untuk perhitungan)
+  const NORMAL_PRICE = 18000; // Harga normal (hanya tampil sebagai info)
+  const WA_NUMBER = '6282362129646';
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const resize = () => {
-      const r = canvas.getBoundingClientRect();
-      if (r.width < 10 || r.height < 10) return;
-      width = canvas.width = r.width;
-      height = canvas.height = r.height;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-    window.addEventListener('load', resize);
-    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(canvas);
+  const rupiah = (n) => 'Rp' + n.toLocaleString('id-ID');
 
-    const point = (x, y) => {
-      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-      const r = canvas.getBoundingClientRect();
-      px = x - r.left;
-      py = y - r.top;
-      targetX = (x / window.innerWidth - 0.5) * 2;
-      targetY = (y / window.innerHeight - 0.5) * 2;
-    };
-    const resetPointer = () => { targetX = targetY = 0; px = py = -9999; };
-
-    window.addEventListener('mousemove', (e) => point(e.clientX, e.clientY));
-    ['touchstart', 'touchmove'].forEach((ev) =>
-      canvas.addEventListener(ev, (e) => {
-        if (e.touches.length) point(e.touches[0].clientX, e.touches[0].clientY);
-      }, { passive: true })
-    );
-    ['touchend', 'touchcancel'].forEach((ev) =>
-      canvas.addEventListener(ev, resetPointer, { passive: true })
-    );
-
-    const dot = (x, y, r, color) => {
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-    };
-
-    const drawCrab = (x, y, scale, leg, scared) => {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.scale(scale, scale);
-
-      ctx.fillStyle = scared ? '#ff1100' : '#ff3b30';
-      ctx.shadowBlur = scared ? 20 : 12;
-      ctx.shadowColor = scared ? '#ffb703' : '#ff6b35';
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 16, 11, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      dot(-6, -13, 3, '#fff');
-      dot(6, -13, 3, '#fff');
-      dot(-6, -14, 1.5, '#000');
-      dot(6, -14, 1.5, '#000');
-
-      ctx.strokeStyle = '#ff3b30';
-      ctx.lineWidth = 3.5;
-      [-1, 1].forEach((sd) => {
-        ctx.beginPath();
-        ctx.moveTo(sd * 10, -6);
-        ctx.quadraticCurveTo(sd * 18, -16, sd * 12, -20);
-        ctx.stroke();
-      });
-
-      ctx.lineWidth = 2;
-      for (let sd = -1; sd <= 1; sd += 2) {
-        for (let i = 0; i < 3; i++) {
-          const phase = Math.sin(leg + i * 0.8) * (scared ? 7 : 4);
-          const sx = sd * 12, sy = -2 + i * 5;
-          ctx.beginPath();
-          ctx.moveTo(sx, sy);
-          ctx.lineTo(sx + sd * 10, sy + phase);
-          ctx.lineTo(sx + sd * 14, sy + 8 + phase);
-          ctx.stroke();
-        }
-      }
-
-      if (scared) {
-        ctx.fillStyle = '#ffb703';
-        ctx.font = 'bold 10px sans-serif';
-        ctx.fillText('💨 KABUR!', -20, -28);
-      }
-      ctx.restore();
-    };
-
-    const draw = () => {
-      requestAnimationFrame(draw);
-      if (width < 10 || height < 10) return;
-      ctx.clearRect(0, 0, width, height);
-
-      mouseX += (targetX - mouseX) * 0.02;
-      mouseY += (targetY - mouseY) * 0.02;
-
-      const boost = Math.min(window.scrollY * 0.0005, 0.002);
-      sphereAngle += 0.004 + boost;
-
-      const cx = width / 2 + mouseX * 10;
-      const cy = height / 2 + mouseY * 10;
-      const R = Math.min(width, height) * 0.32;
-
-      const crabX = Math.cos(crabAngle) * R * 0.95;
-      const crabY = -R * 0.85 + Math.sin(crabAngle * 2) * 8;
-      const near = Math.hypot(px - (cx + crabX), py - (cy + crabY)) < 70;
-
-      flee = near ? 0.03 : flee * 0.94;
-      crabAngle += 0.01 + flee + boost * 0.4;
-
-      ctx.save();
-      ctx.translate(cx, cy);
-
-      for (let i = 0; i < COUNT; i++) {
-        const phi = Math.acos(-1 + (2 * i) / COUNT);
-        const theta = Math.sqrt(COUNT * Math.PI) * phi + sphereAngle;
-        const x = R * Math.cos(theta) * Math.sin(phi);
-        const y = R * Math.sin(theta) * Math.sin(phi);
-        const z = R * Math.cos(phi);
-        const s = (z + R * 1.5) / (R * 2);
-        ctx.beginPath();
-        ctx.arc(x, y, 3 * s, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${10 + (z / R) * 30}, 95%, 60%, ${Math.max(0.1, s * 0.75)})`;
-        ctx.fill();
-      }
-
-      drawCrab(
-        crabX, crabY,
-        0.85 + Math.sin(crabAngle) * 0.15,
-        crabAngle * (near ? 18 : 6),
-        near || flee > 0.02
-      );
-      ctx.restore();
-    };
-    draw();
+  /* ========================================================================
+     1. NAVBAR SCROLL STATE
+     ======================================================================== */
+  const navbar = document.getElementById('navbar');
+  if (navbar) {
+    const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 
-  // --------------------------------------------------------------------------
-  // 2. FORM PEMESANAN → WHATSAPP
-  // --------------------------------------------------------------------------
-  const qtyInput = $('cust-qty');
-  const livePrice = $('live-total-price');
-  const waForm = $('wa-order-form');
-  const addressGroup = $('address-field-group');
-  const addressInput = $('cust-address');
-  const serviceCards = document.querySelectorAll('.service-card');
-  const extras = document.querySelectorAll('.extra-item');
-  const BASE_PRICE = 18000;
+  /* ========================================================================
+     2. HORIZONTAL SCROLL UTILITY (nav + info cards)
+     ======================================================================== */
+  const setupHScroll = (scroller) => {
+    if (!scroller) return;
+    const wrap = scroller.parentElement;
 
-  const rupiah = (n) => `Rp ${n.toLocaleString('id-ID')}`;
-  const getQty = () => Math.min(50, Math.max(1, parseInt(qtyInput.value) || 1));
-  const getTotal = () => {
-    const qty = getQty();
-    let total = qty * BASE_PRICE;
-    extras.forEach((cb) => {
-      if (cb.checked) total += (parseInt(cb.dataset.price) || 0) * qty;
+    const update = () => {
+      const max = scroller.scrollWidth - scroller.clientWidth;
+      const hasOverflow = max > 4;
+      wrap.classList.toggle('has-overflow', hasOverflow);
+      wrap.classList.toggle('at-start', scroller.scrollLeft < 4);
+      wrap.classList.toggle('at-end', scroller.scrollLeft >= max - 4);
+    };
+
+    scroller.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+
+    // Drag-to-scroll (mouse only; touch swipe ditangani browser)
+    let isDown = false, moved = false, startX = 0, startScroll = 0;
+
+    scroller.addEventListener('mousedown', (e) => {
+      isDown = true;
+      moved = false;
+      startX = e.pageX;
+      startScroll = scroller.scrollLeft;
     });
-    return total;
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      const dx = e.pageX - startX;
+      if (Math.abs(dx) > 3) moved = true;
+      if (moved) {
+        e.preventDefault();
+        scroller.classList.add('dragging');
+        scroller.scrollLeft = startScroll - dx;
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDown = false;
+      scroller.classList.remove('dragging');
+    });
+
+    // Cegah klik link saat drag (capture phase)
+    scroller.addEventListener('click', (e) => {
+      if (moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        moved = false;
+      }
+    }, true);
+
+    update();
   };
-  const refreshTotal = () => { livePrice.textContent = rupiah(getTotal()); };
 
-  $('btn-qty-minus').addEventListener('click', () => {
-    qtyInput.value = Math.max(1, getQty() - 1);
-    refreshTotal();
-  });
-  $('btn-qty-plus').addEventListener('click', () => {
-    qtyInput.value = Math.min(50, getQty() + 1);
-    refreshTotal();
-  });
-  extras.forEach((cb) => cb.addEventListener('change', refreshTotal));
+  setupHScroll(document.getElementById('nav-scroll'));
+  setupHScroll(document.getElementById('info-scroll'));
 
-  serviceCards.forEach((card) => {
-    card.addEventListener('click', () => {
-      serviceCards.forEach((c) => c.classList.remove('active'));
-      card.classList.add('active');
-      const radio = card.querySelector('input[type="radio"]');
-      if (radio) radio.checked = true;
+  /* ========================================================================
+     3. ORDER FORM
+     ======================================================================== */
+  const form = document.getElementById('order-form');
+  if (form) {
+    const qtyInput = document.getElementById('cust-qty');
+    const btnMinus = document.getElementById('btn-qty-minus');
+    const btnPlus = document.getElementById('btn-qty-plus');
+    const totalEl = document.getElementById('live-total-price');
+    const totalDetail = document.getElementById('live-total-detail');
+    const extras = form.querySelectorAll('.extra-item');
+    const addrGroup = document.getElementById('address-field-group');
+    const addrInput = document.getElementById('cust-address');
+    const nameInput = document.getElementById('cust-name');
+    const noteInput = document.getElementById('cust-note');
+    const serviceCards = form.querySelectorAll('.service-card');
 
-      const isDelivery = card.dataset.service === 'delivery';
-      addressGroup.style.display = isDelivery ? 'flex' : 'none';
-      addressInput.required = isDelivery;
-      if (!isDelivery) addressInput.value = '';
+    const getQty = () => Math.max(1, Math.min(99, parseInt(qtyInput.value, 10) || 1));
+
+    const getSelectedExtras = () => {
+      const list = [];
+      let perPorsiExtra = 0;
+      extras.forEach((cb) => {
+        if (cb.checked) {
+          list.push({ name: cb.value, price: parseInt(cb.dataset.price, 10) || 0 });
+          perPorsiExtra += parseInt(cb.dataset.price, 10) || 0;
+        }
+      });
+      return { list, perPorsiExtra };
+    };
+
+    const calculateTotal = () => {
+      const qty = getQty();
+      const { list, perPorsiExtra } = getSelectedExtras();
+      const perPorsi = BASE_PRICE + perPorsiExtra;
+      const total = perPorsi * qty;
+
+      if (totalEl) totalEl.textContent = rupiah(total);
+      if (totalDetail) {
+        totalDetail.textContent = list.length
+          ? `${qty} porsi × ${rupiah(BASE_PRICE)} + ${list.length} ekstra`
+          : `${qty} porsi × ${rupiah(BASE_PRICE)}`;
+      }
+    };
+
+    // Qty ±
+    btnMinus.addEventListener('click', () => {
+      qtyInput.value = Math.max(1, getQty() - 1);
+      calculateTotal();
     });
-  });
+    btnPlus.addEventListener('click', () => {
+      qtyInput.value = Math.min(99, getQty() + 1);
+      calculateTotal();
+    });
+    qtyInput.addEventListener('input', () => {
+      const v = parseInt(qtyInput.value, 10);
+      if (Number.isNaN(v) || v < 1) qtyInput.value = 1;
+      if (v > 99) qtyInput.value = 99;
+      calculateTotal();
+    });
 
-  waForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+    // Extras
+    extras.forEach((cb) => cb.addEventListener('change', calculateTotal));
 
-    const name = $('cust-name').value.trim();
-    const qty = getQty();
-    const service = (document.querySelector('input[name="service-type"]:checked') || {}).value || 'Makan di Tempat';
-    const address = addressInput.value.trim();
-    const note = $('cust-note').value.trim();
-    const selected = [...extras].filter((cb) => cb.checked).map((cb) => cb.value);
+    // Service type cards
+    serviceCards.forEach((card) => {
+      card.addEventListener('click', () => {
+        serviceCards.forEach((c) => c.classList.remove('active'));
+        card.classList.add('active');
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
 
-    let msg = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
-    msg += `📋 *DETAIL PESANAN:*\n`;
-    msg += `• Menu Utama: *Crabprek Sambel Geprek*\n`;
-    msg += `• Jumlah: *${qty} Porsi*\n`;
-    msg += `• Layanan: *${service}*\n`;
-    if (selected.length) msg += `• Ekstra: ${selected.join(', ')}\n`;
-    msg += `• Total Est: *${rupiah(getTotal())}*\n\n`;
-    msg += `👤 *DATA PEMESAN:*\n`;
-    msg += `• Nama: ${name}\n`;
-    if (address) msg += `• Alamat/Lokasi Antar: ${address}\n`;
-    if (note) msg += `• Catatan: ${note}\n`;
-    msg += `\nMohon diproses ya kak. Terima kasih! 🦀🔥`;
+        const isDelivery = card.dataset.service === 'delivery';
+        addrGroup.hidden = !isDelivery;
+        addrInput.required = isDelivery;
+        if (!isDelivery) {
+          addrInput.value = '';
+          addrGroup.classList.remove('error');
+        }
+      });
+    });
 
-    window.location.href = `https://wa.me/6282362129646?text=${encodeURIComponent(msg)}`;
-  });
+    // Inisialisasi
+    calculateTotal();
 
-  // --------------------------------------------------------------------------
-  // 3. MODAL JAM ANALOG + DIGITAL (waktu WIB)
-  // --------------------------------------------------------------------------
-  const clockTrigger = $('trigger-clock-modal');
-  const clockModal = $('clock-modal');
-  const clockCanvas = $('analog-clock-canvas');
-  const digitalText = $('digital-clock-text');
-  let clockTimer = null;
+    /* --- Submit → WhatsApp --- */
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const name = nameInput.value.trim();
+      if (!name) {
+        nameInput.classList.add('error');
+        nameInput.focus();
+        return;
+      }
+      nameInput.classList.remove('error');
+
+      const qty = getQty();
+      const activeRadio = form.querySelector('input[name="service-type"]:checked');
+      const service = activeRadio ? activeRadio.value : 'Makan di Tempat';
+      const isDelivery = service === 'Delivery';
+      const address = addrInput.value.trim();
+
+      if (isDelivery && !address) {
+        addrGroup.classList.add('error');
+        addrInput.focus();
+        return;
+      }
+      addrGroup.classList.remove('error');
+
+      const note = noteInput.value.trim();
+      const { list: extrasList, perPorsiExtra } = getSelectedExtras();
+      const perPorsi = BASE_PRICE + perPorsiExtra;
+      const total = perPorsi * qty;
+
+      let msg = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
+      msg += `📋 *DETAIL PESANAN*\n`;
+      msg += `• Menu: *Crabprek Sambel Geprek*\n`;
+      msg += `• Jumlah: *${qty} porsi*\n`;
+      msg += `• Layanan: *${service}*\n`;
+      msg += `• Harga Normal: ${rupiah(NORMAL_PRICE)} /porsi\n`;
+      msg += `• Harga Promo: ${rupiah(BASE_PRICE)} /porsi\n`;
+      if (extrasList.length) {
+        msg += `• Ekstra:\n`;
+        extrasList.forEach((ex) => {
+          msg += `   – ${ex.name} (+${rupiah(ex.price)})\n`;
+        });
+      }
+      msg += `\n👤 *DATA PEMESAN*\n`;
+      msg += `• Nama: ${name}\n`;
+      if (isDelivery && address) msg += `• Alamat: ${address}\n`;
+      if (note) msg += `• Catatan: ${note}\n`;
+      msg += `\n💰 *TOTAL ESTIMASI: ${rupiah(total)}*\n`;
+      msg += `\nMohon diproses ya kak. Terima kasih! 🦀🔥`;
+
+      const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank', 'noopener');
+    });
+  }
+
+  /* ========================================================================
+     4. MODAL JAM ANALOG + DIGITAL
+     ======================================================================== */
+  const clockTrigger = document.getElementById('trigger-clock-modal');
+  const clockModal = document.getElementById('clock-modal');
+  const btnCloseClock = document.getElementById('btn-close-clock');
+  const clockCanvas = document.getElementById('analog-clock-canvas');
+  const digitalClockText = document.getElementById('digital-clock-text');
+  let clockInterval = null;
 
   const drawClock = () => {
-    const c = clockCanvas.getContext('2d');
-    const R = clockCanvas.width / 2;
-    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
-    const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+    if (!clockCanvas) return;
+    const ctx = clockCanvas.getContext('2d');
+    const size = clockCanvas.width;
+    const radius = size / 2;
+    const now = new Date();
+    const h = now.getHours();
+    const m = now.getMinutes();
+    const s = now.getSeconds();
 
-    digitalText.textContent = [h, m, s].map((n) => String(n).padStart(2, '0')).join(':') + ' WIB';
-
-    c.clearRect(0, 0, clockCanvas.width, clockCanvas.height);
-    c.save();
-    c.translate(R, R);
-
-    c.beginPath();
-    c.arc(0, 0, R - 8, 0, Math.PI * 2);
-    c.fillStyle = '#12141d';
-    c.fill();
-    c.lineWidth = 4;
-    c.strokeStyle = '#ff3b30';
-    c.stroke();
-
-    c.font = '28px sans-serif';
-    c.textAlign = 'center';
-    c.textBaseline = 'middle';
-    c.fillText('🦀', 0, 0);
-
-    c.lineCap = 'round';
-    c.strokeStyle = '#ffb703';
-    c.lineWidth = 3;
-    for (let i = 0; i < 12; i++) {
-      c.save();
-      c.rotate((i * Math.PI) / 6);
-      c.beginPath();
-      c.moveTo(0, -(R - 20));
-      c.lineTo(0, -(R - 12));
-      c.stroke();
-      c.restore();
+    if (digitalClockText) {
+      digitalClockText.textContent =
+        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')} WIB`;
     }
 
-    const hand = (angle, len, color, w, tail = 0) => {
-      c.save();
-      c.rotate(angle);
-      c.beginPath();
-      c.moveTo(0, tail);
-      c.lineTo(0, -len);
-      c.strokeStyle = color;
-      c.lineWidth = w;
-      c.stroke();
-      c.restore();
-    };
-    hand(((h % 12) * Math.PI) / 6 + (m * Math.PI) / 360, R * 0.5, '#f8fafc', 5);
-    hand((m * Math.PI) / 30 + (s * Math.PI) / 1800, R * 0.7, '#ffb703', 3);
-    hand((s * Math.PI) / 30, R * 0.82, '#ff3b30', 2, 10);
+    ctx.clearRect(0, 0, size, size);
+    ctx.save();
+    ctx.translate(radius, radius);
 
-    c.restore();
+    // Face
+    ctx.beginPath();
+    ctx.arc(0, 0, radius - 10, 0, Math.PI * 2);
+    ctx.fillStyle = '#FAF3E7';
+    ctx.fill();
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#D62828';
+    ctx.stroke();
+
+    // Tick marks
+    for (let i = 0; i < 12; i++) {
+      const angle = (i * Math.PI) / 6;
+      ctx.save();
+      ctx.rotate(angle);
+      ctx.beginPath();
+      ctx.moveTo(0, -(radius - 22));
+      ctx.lineTo(0, -(radius - 32));
+      ctx.strokeStyle = i % 3 === 0 ? '#2B1D14' : 'rgba(43,29,20,0.35)';
+      ctx.lineWidth = i % 3 === 0 ? 3 : 1.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Center crab emoji
+    ctx.font = '26px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🦀', 0, -radius * 0.5);
+
+    // Hour hand
+    const hourAng = ((h % 12) * Math.PI) / 6 + (m * Math.PI) / 360;
+    ctx.save();
+    ctx.rotate(hourAng);
+    ctx.beginPath();
+    ctx.moveTo(0, 6);
+    ctx.lineTo(0, -(radius * 0.5));
+    ctx.strokeStyle = '#2B1D14';
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.restore();
+
+    // Minute hand
+    const minAng = (m * Math.PI) / 30 + (s * Math.PI) / 1800;
+    ctx.save();
+    ctx.rotate(minAng);
+    ctx.beginPath();
+    ctx.moveTo(0, 6);
+    ctx.lineTo(0, -(radius * 0.72));
+    ctx.strokeStyle = '#D62828';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.restore();
+
+    // Second hand
+    const secAng = (s * Math.PI) / 30;
+    ctx.save();
+    ctx.rotate(secAng);
+    ctx.beginPath();
+    ctx.moveTo(0, 12);
+    ctx.lineTo(0, -(radius * 0.85));
+    ctx.strokeStyle = '#F4A261';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    ctx.restore();
+
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(0, 0, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#D62828';
+    ctx.fill();
+
+    ctx.restore();
   };
 
   const openClock = () => {
+    if (!clockModal) return;
     clockModal.classList.add('active');
     drawClock();
-    clearInterval(clockTimer);
-    clockTimer = setInterval(drawClock, 1000);
+    if (clockInterval) clearInterval(clockInterval);
+    clockInterval = setInterval(drawClock, 1000);
   };
   const closeClock = () => {
+    if (!clockModal) return;
     clockModal.classList.remove('active');
-    clearInterval(clockTimer);
+    if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
   };
 
-  clockTrigger.addEventListener('click', openClock);
-  clockTrigger.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openClock(); }
-  });
-  $('btn-close-clock').addEventListener('click', closeClock);
-  clockModal.addEventListener('click', (e) => { if (e.target === clockModal) closeClock(); });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && clockModal.classList.contains('active')) closeClock();
-  });
-
-  // --------------------------------------------------------------------------
-  // 4. TILT KARTU PRODUK (hanya perangkat dengan kursor)
-  // --------------------------------------------------------------------------
-  const tiltCard = document.querySelector('.tilt-card');
-  if (tiltCard && window.matchMedia('(hover: hover)').matches) {
-    tiltCard.addEventListener('mousemove', (e) => {
-      const r = tiltCard.getBoundingClientRect();
-      const x = e.clientX - r.left - r.width / 2;
-      const y = e.clientY - r.top - r.height / 2;
-      tiltCard.style.transform = `perspective(1000px) rotateX(${(y / r.height) * -5}deg) rotateY(${(x / r.width) * 5}deg)`;
-    });
-    tiltCard.addEventListener('mouseleave', () => {
-      tiltCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+  if (clockTrigger) clockTrigger.addEventListener('click', openClock);
+  if (btnCloseClock) btnCloseClock.addEventListener('click', closeClock);
+  if (clockModal) {
+    clockModal.addEventListener('click', (e) => {
+      if (e.target === clockModal) closeClock();
     });
   }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && clockModal && clockModal.classList.contains('active')) closeClock();
+  });
 
-  // --------------------------------------------------------------------------
-  // 5. NAVBAR, SCROLLSPY & HORIZONTAL SCROLLER (geser mouse / sentuhan)
-  // --------------------------------------------------------------------------
-  const navbar = $('navbar');
-  const nav = $('main-nav');
-  const navLinks = [...nav.querySelectorAll('a')];
+  /* ========================================================================
+     5. SCROLL REVEAL
+     ======================================================================== */
+  const revealEls = document.querySelectorAll('.reveal');
+  if (reduceMotion || !('IntersectionObserver' in window)) {
+    revealEls.forEach((el) => el.classList.add('visible'));
+  } else {
+    const revealIO = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealIO.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach((el) => revealIO.observe(el));
+  }
 
-  const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 24);
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  // Tandai tepi yang masih bisa digeser (memunculkan fade di sisi tersebut)
-  const updateEdges = (el) => {
-    const max = el.scrollWidth - el.clientWidth;
-    el.classList.toggle('can-l', el.scrollLeft > 4);
-    el.classList.toggle('can-r', el.scrollLeft < max - 4);
-  };
-
-  // Sentuhan memakai scroll native; mouse memakai drag-to-scroll
-  const enableDragScroll = (el) => {
-    let down = false, moved = false, startX = 0, startLeft = 0;
-
-    el.addEventListener('pointerdown', (e) => {
-      if (e.pointerType !== 'mouse' || e.button !== 0) return;
-      down = true;
-      moved = false;
-      startX = e.clientX;
-      startLeft = el.scrollLeft;
-    });
-    window.addEventListener('pointermove', (e) => {
-      if (!down) return;
-      const dx = e.clientX - startX;
-      if (!moved && Math.abs(dx) > 5) { moved = true; el.classList.add('dragging'); }
-      if (moved) el.scrollLeft = startLeft - dx;
-    });
-    const end = () => { down = false; el.classList.remove('dragging'); };
-    window.addEventListener('pointerup', end);
-    window.addEventListener('pointercancel', end);
-
-    // Cegah klik link/kartu yang tidak sengaja setelah drag
-    el.addEventListener('click', (e) => {
-      if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; }
-    }, true);
-
-    el.addEventListener('scroll', () => updateEdges(el), { passive: true });
-    if ('ResizeObserver' in window) new ResizeObserver(() => updateEdges(el)).observe(el);
-    window.addEventListener('load', () => updateEdges(el));
-    updateEdges(el);
-  };
-
-  enableDragScroll(nav);
-  const infoScroller = $('info-scroller');
-  if (infoScroller) enableDragScroll(infoScroller);
-
-  // Scrollspy: menu aktif mengikuti section dan otomatis berada di tengah navigasi
-  let current = null;
-  const setActive = (id) => {
-    if (id === current) return;
-    current = id;
-    navLinks.forEach((a) => {
-      const on = a.getAttribute('href') === `#${id}`;
-      a.classList.toggle('active', on);
-      if (on && nav.scrollWidth > nav.clientWidth) {
-        nav.scrollTo({ left: a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' });
-      }
-    });
-  };
-
-  const spy = new IntersectionObserver((entries) => {
-    entries.forEach((en) => { if (en.isIntersecting) setActive(en.target.id); });
-  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
-  navLinks
-    .map((a) => document.querySelector(a.getAttribute('href')))
-    .filter(Boolean)
-    .forEach((sec) => spy.observe(sec));
-
-  // --------------------------------------------------------------------------
-  // 6. REVEAL SAAT SCROLL
-  // --------------------------------------------------------------------------
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach((en) => {
-      if (en.isIntersecting) {
-        en.target.classList.add('active');
-        revealObserver.unobserve(en.target);
-      }
-    });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+  /* ========================================================================
+     6. ACTIVE NAV LINK
+     ======================================================================== */
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('main section[id]');
+  if ('IntersectionObserver' in window && sections.length) {
+    const navIO = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navLinks.forEach((link) => {
+            const isActive = link.getAttribute('href') === `#${id}`;
+            link.classList.toggle('active', isActive);
+          });
+        }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+    sections.forEach((s) => navIO.observe(s));
+  }
 });

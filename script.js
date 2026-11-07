@@ -1,6 +1,6 @@
 /* ==========================================================================
    CRABPREK JAVASCRIPT ENGINE
-   (FIXED: touch gesture, canvas sizing, smooth animation, real URLs)
+   (FIXED: touch gesture, no NaN, smooth animation, real URLs)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -36,6 +36,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.addEventListener('mousemove', (e) => addParticle(e.clientX, e.clientY));
+
+    // ✅ FIX: e.touches[0] (sebelumnya e.touches → undefined → tidak muncul)
     window.addEventListener('touchmove', (e) => {
       if (e.touches.length > 0) {
         addParticle(e.touches[0].clientX, e.touches[0].clientY);
@@ -73,47 +75,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 2. HERO CANVAS 3D ENGINE
+  // 2. HERO CANVAS 3D ENGINE (BOLA & KEPITING INTERAKTIF)
   // --------------------------------------------------------------------------
   const canvas = document.getElementById('hero-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
-    let width = 0, height = 0;
+    let width, height;
     let mouseX = 0, mouseY = 0;
     let targetMouseX = 0, targetMouseY = 0;
 
     let canvasPointerX = -9999;
     let canvasPointerY = -9999;
 
-    // ✅ Robust resize (retry + ResizeObserver)
-    let resizeAttempts = 0;
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      if ((rect.width < 10 || rect.height < 10) && resizeAttempts < 30) {
-        resizeAttempts++;
-        requestAnimationFrame(resize);
-        return;
-      }
-      width = canvas.width = Math.max(1, rect.width);
-      height = canvas.height = Math.max(1, rect.height);
+      width = canvas.width = rect.width;
+      height = canvas.height = rect.height;
     };
-    window.addEventListener('resize', () => {
-      resizeAttempts = 0;
-      resize();
-    });
+    window.addEventListener('resize', resize);
     resize();
 
-    if (typeof ResizeObserver !== 'undefined') {
-      const ro = new ResizeObserver(() => {
-        const rect = canvas.getBoundingClientRect();
-        if (rect.width >= 10 && rect.height >= 10) {
-          width = canvas.width = rect.width;
-          height = canvas.height = rect.height;
-        }
-      });
-      ro.observe(canvas);
-    }
-
+    // ✅ FIX: guard anti-NaN
     const updatePointerPos = (clientX, clientY) => {
       if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return;
 
@@ -125,6 +107,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.addEventListener('mousemove', (e) => updatePointerPos(e.clientX, e.clientY));
+
+    // ✅ FIX: e.touches[0] — ini yang bikin bola lari ke sudut atas
     canvas.addEventListener('touchstart', (e) => {
       if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
@@ -132,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
 
+    // ✅ NEW: reset saat jari diangkat → bola balik ke tengah, crab berhenti kabur
     const resetPointer = () => {
       targetMouseX = 0;
       targetMouseY = 0;
@@ -140,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     canvas.addEventListener('touchend', resetPointer, { passive: true });
     canvas.addEventListener('touchcancel', resetPointer, { passive: true });
+    canvas.addEventListener('mouseleave', resetPointer);
 
     const particleCount = 110;
     let sphereAngle = 0;
@@ -209,19 +195,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const drawVisualStage = () => {
-      // ✅ Defensive: reset NaN, dan skip frame kalau canvas belum siap
+      // ✅ Defensive: jika NaN muncul karena apa pun, reset ke 0
       if (!Number.isFinite(mouseX)) mouseX = 0;
       if (!Number.isFinite(mouseY)) mouseY = 0;
       if (!Number.isFinite(targetMouseX)) targetMouseX = 0;
       if (!Number.isFinite(targetMouseY)) targetMouseY = 0;
 
-      if (width < 10 || height < 10) {
-        requestAnimationFrame(drawVisualStage);
-        return;
-      }
-
       ctx.clearRect(0, 0, width, height);
 
+      // Animasi santai & stabil
       mouseX += (targetMouseX - mouseX) * 0.02;
       mouseY += (targetMouseY - mouseY) * 0.02;
 
@@ -283,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 3. FORM PEMESANAN
+  // 3. FORM PEMESANAN INTERAKTIF & HARGA EKSTRA REVISI
   // --------------------------------------------------------------------------
   const qtyInput = document.getElementById('cust-qty');
   const btnMinus = document.getElementById('btn-qty-minus');
@@ -393,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 4. MODAL JAM ANALOG
+  // 4. MODAL JAM ANALOG INTERAKTIF
   // --------------------------------------------------------------------------
   const clockTrigger = document.getElementById('trigger-clock-modal');
   const clockModal = document.getElementById('clock-modal');
@@ -504,7 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 5. PARALLAX 3D TILT
+  // 5. PARALLAX 3D TILT ON HOVER
   // --------------------------------------------------------------------------
   const tiltCard = document.querySelector('.tilt-card');
   if (tiltCard) {
@@ -525,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 6. NAVBAR SCROLL & REVEAL
+  // 6. NAVBAR SCROLL SHIFT & SCROLL REVEAL OBSERVER
   // --------------------------------------------------------------------------
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {

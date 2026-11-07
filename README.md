@@ -1,35 +1,27 @@
-# 🦀 CRABPREK — Website Landing Page
+# 🦀 CRABPREK — Sensasi Seafood Geprek, Padehnyo Mupakaik!
 
-Website resmi **CRABPREK**, UMKM kuliner kepiting geprek khas Payakumbuh.
-Dibangun dengan **HTML, CSS, dan Vanilla JavaScript murni** — tanpa framework, tanpa build step, tanpa backend.
+Website landing page interaktif untuk **CRABPREK**, UMKM kuliner kepiting geprek khas Payakumbuh.
+Dibangun dengan **HTML, CSS, dan Vanilla JavaScript murni** — tanpa framework, tanpa build step.
 
-> _"Satu-satunya kepiting renyah di Payakumbuh yang bisa dimakan langsung tanpa ribet kupas cangkang!"_
-
----
-
-## 1. Deskripsi Website
-
-Website ini berfungsi sebagai **landing page + form pemesanan**:
-
-- Menampilkan produk utama **Crabprek Sambel Geprek** beserta harga normal (**Rp18.000**) dan harga promo (**Rp16.000**).
-- Memungkinkan pengunjung mengisi form pesanan (nama, porsi, jenis layanan, ekstra, alamat, catatan) yang langsung dikirim ke **WhatsApp** CRABPREK dengan format pesan rapi.
-- Menampilkan informasi lokasi (Taman Batang Agam), jam operasional (07.00–18.00 WIB), metode pembayaran (Tunai & QRIS), dan tautan sosial media.
-
-Semua perhitungan total dilakukan di sisi browser menggunakan **harga promo Rp16.000**. Harga normal Rp18.000 hanya ditampilkan sebagai informasi harga sebelum promo.
+> **Tagline:** *"Satu-satunya kepiting renyah di Payakumbuh yang bisa dimakan langsung tanpa ribet kupas cangkang!"*
 
 ---
 
-## 2. Teknologi yang Digunakan
+## ✨ Fitur Utama
 
-| Teknologi | Keterangan |
+| Fitur | Deskripsi |
 |---|---|
-| HTML5 | Semantic markup, meta SEO dasar |
-| CSS3 | Custom properties, flexbox, grid, scroll-snap, media queries, `prefers-reduced-motion` |
-| Vanilla JavaScript | DOM manipulation, IntersectionObserver, Canvas 2D (jam analog) |
-| Google Fonts | Bricolage Grotesque + Plus Jakarta Sans |
-
-**Tidak memerlukan:** Node.js, npm, build tools, backend, database, atau API berbayar.
+| 🎨 **Custom Cursor Trail** | Partikel merah-oranye mengikuti kursor / sentuhan (canvas). |
+| 🖼️ **Hero Canvas 3D** | Bola partikel 3D + kepiting prosedural yang "kabur" saat didekati kursor. |
+| 🛒 **Form Pemesanan WA** | Pesanan otomatis dikirim ke WhatsApp dengan format pesan rapi. |
+| 🧮 **Live Price Calculator** | Total harga update otomatis saat pilih qty / ekstra. |
+| 🚚 **Kondisional Delivery** | Field alamat hanya muncul saat pilih layanan *Pesan Antar*. |
+| 🕒 **Modal Jam Analog** | Jam analog live + jam digital WIB, dibuka lewat tile *Jam Operasional*. |
+| 📱 **Responsive** | Layout adaptif untuk mobile, tablet, dan desktop. |
+| 🌈 **Glassmorphism UI** | Navbar & card transparan dengan blur + ambient glow orbs. |
+| 🎬 **Scroll Reveal** | Elemen muncul halus saat masuk viewport (IntersectionObserver). |
+| 🎯 **3D Tilt Card** | Kartu produk miring mengikuti kursor (parallax effect). |
 
 ---
 
-## 3. Struktur Folder
+## 📁 Struktur Proyek

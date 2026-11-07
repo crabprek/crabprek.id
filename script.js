@@ -1,554 +1,418 @@
 /* ==========================================================================
-   CRABPREK JAVASCRIPT ENGINE
-   (FIXED: touch gesture, canvas sizing, smooth animation, real URLs)
+   CRABPREK — script.js
+   Hero canvas · form WhatsApp · jam analog · navigasi & kartu horizontal scroll
    ========================================================================== */
-
 document.addEventListener('DOMContentLoaded', () => {
+  const $ = (id) => document.getElementById(id);
 
   // --------------------------------------------------------------------------
-  // 1. CUSTOM CURSOR TRAIL ENGINE
+  // 1. HERO CANVAS (bola partikel + kepiting prosedural yang kabur dari sentuhan)
   // --------------------------------------------------------------------------
-  const trailCanvas = document.getElementById('trail-canvas');
-  if (trailCanvas) {
-    const tCtx = trailCanvas.getContext('2d');
-    let tWidth = trailCanvas.width = window.innerWidth;
-    let tHeight = trailCanvas.height = window.innerHeight;
-
-    window.addEventListener('resize', () => {
-      tWidth = trailCanvas.width = window.innerWidth;
-      tHeight = trailCanvas.height = window.innerHeight;
-    });
-
-    const particles = [];
-
-    const addParticle = (x, y) => {
-      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-      if (particles.length > 40) particles.shift();
-      particles.push({
-        x: x,
-        y: y,
-        size: Math.random() * 6 + 3,
-        alpha: 1,
-        color: Math.random() > 0.5 ? '#ff3b30' : '#ffb703',
-        vx: (Math.random() - 0.5) * 1.5,
-        vy: (Math.random() - 0.5) * 1.5 - 1
-      });
-    };
-
-    window.addEventListener('mousemove', (e) => addParticle(e.clientX, e.clientY));
-    window.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) {
-        addParticle(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    }, { passive: true });
-    window.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 0) {
-        addParticle(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    }, { passive: true });
-
-    const animateTrail = () => {
-      tCtx.clearRect(0, 0, tWidth, tHeight);
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.025;
-
-        if (p.alpha > 0) {
-          tCtx.save();
-          tCtx.globalAlpha = p.alpha;
-          tCtx.fillStyle = p.color;
-          tCtx.shadowBlur = 10;
-          tCtx.shadowColor = p.color;
-          tCtx.beginPath();
-          tCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          tCtx.fill();
-          tCtx.restore();
-        }
-      }
-      requestAnimationFrame(animateTrail);
-    };
-    animateTrail();
-  }
-
-  // --------------------------------------------------------------------------
-  // 2. HERO CANVAS 3D ENGINE
-  // --------------------------------------------------------------------------
-  const canvas = document.getElementById('hero-canvas');
+  const canvas = $('hero-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
+    const COUNT = 110;
     let width = 0, height = 0;
-    let mouseX = 0, mouseY = 0;
-    let targetMouseX = 0, targetMouseY = 0;
+    let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+    let px = -9999, py = -9999;
+    let sphereAngle = 0, crabAngle = 0, flee = 0;
 
-    let canvasPointerX = -9999;
-    let canvasPointerY = -9999;
-
-    // ✅ Robust resize (retry + ResizeObserver)
-    let resizeAttempts = 0;
     const resize = () => {
-      const rect = canvas.getBoundingClientRect();
-      if ((rect.width < 10 || rect.height < 10) && resizeAttempts < 30) {
-        resizeAttempts++;
-        requestAnimationFrame(resize);
-        return;
-      }
-      width = canvas.width = Math.max(1, rect.width);
-      height = canvas.height = Math.max(1, rect.height);
+      const r = canvas.getBoundingClientRect();
+      if (r.width < 10 || r.height < 10) return;
+      width = canvas.width = r.width;
+      height = canvas.height = r.height;
     };
-    window.addEventListener('resize', () => {
-      resizeAttempts = 0;
-      resize();
-    });
     resize();
+    window.addEventListener('resize', resize);
+    window.addEventListener('load', resize);
+    if ('ResizeObserver' in window) new ResizeObserver(resize).observe(canvas);
 
-    if (typeof ResizeObserver !== 'undefined') {
-      const ro = new ResizeObserver(() => {
-        const rect = canvas.getBoundingClientRect();
-        if (rect.width >= 10 && rect.height >= 10) {
-          width = canvas.width = rect.width;
-          height = canvas.height = rect.height;
-        }
-      });
-      ro.observe(canvas);
-    }
+    const point = (x, y) => {
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+      const r = canvas.getBoundingClientRect();
+      px = x - r.left;
+      py = y - r.top;
+      targetX = (x / window.innerWidth - 0.5) * 2;
+      targetY = (y / window.innerHeight - 0.5) * 2;
+    };
+    const resetPointer = () => { targetX = targetY = 0; px = py = -9999; };
 
-    const updatePointerPos = (clientX, clientY) => {
-      if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return;
+    window.addEventListener('mousemove', (e) => point(e.clientX, e.clientY));
+    ['touchstart', 'touchmove'].forEach((ev) =>
+      canvas.addEventListener(ev, (e) => {
+        if (e.touches.length) point(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true })
+    );
+    ['touchend', 'touchcancel'].forEach((ev) =>
+      canvas.addEventListener(ev, resetPointer, { passive: true })
+    );
 
-      const rect = canvas.getBoundingClientRect();
-      canvasPointerX = clientX - rect.left;
-      canvasPointerY = clientY - rect.top;
-      targetMouseX = (clientX / window.innerWidth - 0.5) * 2;
-      targetMouseY = (clientY / window.innerHeight - 0.5) * 2;
+    const dot = (x, y, r, color) => {
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
     };
 
-    window.addEventListener('mousemove', (e) => updatePointerPos(e.clientX, e.clientY));
-    canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: true });
-    canvas.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
-    }, { passive: true });
-
-    const resetPointer = () => {
-      targetMouseX = 0;
-      targetMouseY = 0;
-      canvasPointerX = -9999;
-      canvasPointerY = -9999;
-    };
-    canvas.addEventListener('touchend', resetPointer, { passive: true });
-    canvas.addEventListener('touchcancel', resetPointer, { passive: true });
-
-    const particleCount = 110;
-    let sphereAngle = 0;
-    let crabWalkAngle = 0;
-    let crabFleeSpeed = 0;
-
-    const drawProceduralCrab = (x, y, scale, legCycle, isFleeing) => {
+    const drawCrab = (x, y, scale, leg, scared) => {
       ctx.save();
       ctx.translate(x, y);
       ctx.scale(scale, scale);
 
-      ctx.fillStyle = isFleeing ? '#ff1100' : '#ff3b30';
-      ctx.shadowBlur = isFleeing ? 20 : 12;
-      ctx.shadowColor = isFleeing ? '#ffb703' : '#ff6b35';
-
+      ctx.fillStyle = scared ? '#ff1100' : '#ff3b30';
+      ctx.shadowBlur = scared ? 20 : 12;
+      ctx.shadowColor = scared ? '#ffb703' : '#ff6b35';
       ctx.beginPath();
       ctx.ellipse(0, 0, 16, 11, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = '#fff';
-      ctx.beginPath();
-      ctx.arc(-6, -13, 3, 0, Math.PI * 2);
-      ctx.arc(6, -13, 3, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.arc(-6, -14, 1.5, 0, Math.PI * 2);
-      ctx.arc(6, -14, 1.5, 0, Math.PI * 2);
-      ctx.fill();
+      dot(-6, -13, 3, '#fff');
+      dot(6, -13, 3, '#fff');
+      dot(-6, -14, 1.5, '#000');
+      dot(6, -14, 1.5, '#000');
 
       ctx.strokeStyle = '#ff3b30';
       ctx.lineWidth = 3.5;
-
-      ctx.beginPath();
-      ctx.moveTo(-10, -6);
-      ctx.quadraticCurveTo(-18, -16, -12, -20);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(10, -6);
-      ctx.quadraticCurveTo(18, -16, 12, -20);
-      ctx.stroke();
+      [-1, 1].forEach((sd) => {
+        ctx.beginPath();
+        ctx.moveTo(sd * 10, -6);
+        ctx.quadraticCurveTo(sd * 18, -16, sd * 12, -20);
+        ctx.stroke();
+      });
 
       ctx.lineWidth = 2;
-      for (let side = -1; side <= 1; side += 2) {
+      for (let sd = -1; sd <= 1; sd += 2) {
         for (let i = 0; i < 3; i++) {
-          const legPhase = Math.sin(legCycle + i * 0.8) * (isFleeing ? 7 : 4);
-          const startX = side * 12;
-          const startY = -2 + i * 5;
-
+          const phase = Math.sin(leg + i * 0.8) * (scared ? 7 : 4);
+          const sx = sd * 12, sy = -2 + i * 5;
           ctx.beginPath();
-          ctx.moveTo(startX, startY);
-          ctx.lineTo(startX + side * 10, startY + legPhase);
-          ctx.lineTo(startX + side * 14, startY + 8 + legPhase);
+          ctx.moveTo(sx, sy);
+          ctx.lineTo(sx + sd * 10, sy + phase);
+          ctx.lineTo(sx + sd * 14, sy + 8 + phase);
           ctx.stroke();
         }
       }
 
-      if (isFleeing) {
+      if (scared) {
         ctx.fillStyle = '#ffb703';
         ctx.font = 'bold 10px sans-serif';
         ctx.fillText('💨 KABUR!', -20, -28);
       }
-
       ctx.restore();
     };
 
-    const drawVisualStage = () => {
-      // ✅ Defensive: reset NaN, dan skip frame kalau canvas belum siap
-      if (!Number.isFinite(mouseX)) mouseX = 0;
-      if (!Number.isFinite(mouseY)) mouseY = 0;
-      if (!Number.isFinite(targetMouseX)) targetMouseX = 0;
-      if (!Number.isFinite(targetMouseY)) targetMouseY = 0;
-
-      if (width < 10 || height < 10) {
-        requestAnimationFrame(drawVisualStage);
-        return;
-      }
-
+    const draw = () => {
+      requestAnimationFrame(draw);
+      if (width < 10 || height < 10) return;
       ctx.clearRect(0, 0, width, height);
 
-      mouseX += (targetMouseX - mouseX) * 0.02;
-      mouseY += (targetMouseY - mouseY) * 0.02;
+      mouseX += (targetX - mouseX) * 0.02;
+      mouseY += (targetY - mouseY) * 0.02;
 
-      const scrollSpeed = Math.min(window.scrollY * 0.0005, 0.002);
-      sphereAngle += 0.004 + scrollSpeed;
+      const boost = Math.min(window.scrollY * 0.0005, 0.002);
+      sphereAngle += 0.004 + boost;
 
-      const centerX = width * 0.5 + mouseX * 10;
-      const centerY = height * 0.5 + mouseY * 10;
-      const radius = Math.min(width, height) * 0.32;
+      const cx = width / 2 + mouseX * 10;
+      const cy = height / 2 + mouseY * 10;
+      const R = Math.min(width, height) * 0.32;
 
-      const crabX = Math.cos(crabWalkAngle) * (radius * 0.95);
-      const crabY = -radius * 0.85 + Math.sin(crabWalkAngle * 2) * 8;
-      const crabAbsX = centerX + crabX;
-      const crabAbsY = centerY + crabY;
+      const crabX = Math.cos(crabAngle) * R * 0.95;
+      const crabY = -R * 0.85 + Math.sin(crabAngle * 2) * 8;
+      const near = Math.hypot(px - (cx + crabX), py - (cy + crabY)) < 70;
 
-      const distToPointer = Math.hypot(canvasPointerX - crabAbsX, canvasPointerY - crabAbsY);
-      const isTouchNear = distToPointer < 70;
-
-      if (isTouchNear) {
-        crabFleeSpeed = 0.03;
-      } else {
-        crabFleeSpeed *= 0.94;
-      }
-
-      crabWalkAngle += 0.010 + crabFleeSpeed + scrollSpeed * 0.4;
+      flee = near ? 0.03 : flee * 0.94;
+      crabAngle += 0.01 + flee + boost * 0.4;
 
       ctx.save();
-      ctx.translate(centerX, centerY);
+      ctx.translate(cx, cy);
 
-      for (let i = 0; i < particleCount; i++) {
-        const phi = Math.acos(-1 + (2 * i) / particleCount);
-        const theta = Math.sqrt(particleCount * Math.PI) * phi + sphereAngle;
-
-        const x = radius * Math.cos(theta) * Math.sin(phi);
-        const y = radius * Math.sin(theta) * Math.sin(phi);
-        const z = radius * Math.cos(phi);
-
-        const scale = (z + radius * 1.5) / (radius * 2);
-        const alpha = Math.max(0.1, scale * 0.75);
-
+      for (let i = 0; i < COUNT; i++) {
+        const phi = Math.acos(-1 + (2 * i) / COUNT);
+        const theta = Math.sqrt(COUNT * Math.PI) * phi + sphereAngle;
+        const x = R * Math.cos(theta) * Math.sin(phi);
+        const y = R * Math.sin(theta) * Math.sin(phi);
+        const z = R * Math.cos(phi);
+        const s = (z + R * 1.5) / (R * 2);
         ctx.beginPath();
-        ctx.arc(x, y, 3 * scale, 0, Math.PI * 2);
-
-        const hue = 10 + (z / radius) * 30;
-        ctx.fillStyle = `hsla(${hue}, 95%, 60%, ${alpha})`;
+        ctx.arc(x, y, 3 * s, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${10 + (z / R) * 30}, 95%, 60%, ${Math.max(0.1, s * 0.75)})`;
         ctx.fill();
       }
 
-      const crabScale = 0.85 + Math.sin(crabWalkAngle) * 0.15;
-      const legCycleSpeed = isTouchNear ? crabWalkAngle * 18 : crabWalkAngle * 6;
-
-      drawProceduralCrab(crabX, crabY, crabScale, legCycleSpeed, isTouchNear || crabFleeSpeed > 0.02);
-
+      drawCrab(
+        crabX, crabY,
+        0.85 + Math.sin(crabAngle) * 0.15,
+        crabAngle * (near ? 18 : 6),
+        near || flee > 0.02
+      );
       ctx.restore();
-      requestAnimationFrame(drawVisualStage);
     };
-
-    drawVisualStage();
+    draw();
   }
 
   // --------------------------------------------------------------------------
-  // 3. FORM PEMESANAN
+  // 2. FORM PEMESANAN → WHATSAPP
   // --------------------------------------------------------------------------
-  const qtyInput = document.getElementById('cust-qty');
-  const btnMinus = document.getElementById('btn-qty-minus');
-  const btnPlus = document.getElementById('btn-qty-plus');
-  const livePriceEl = document.getElementById('live-total-price');
-  const waForm = document.getElementById('wa-order-form');
+  const qtyInput = $('cust-qty');
+  const livePrice = $('live-total-price');
+  const waForm = $('wa-order-form');
+  const addressGroup = $('address-field-group');
+  const addressInput = $('cust-address');
   const serviceCards = document.querySelectorAll('.service-card');
-  const extraCheckboxes = document.querySelectorAll('.extra-item');
-  const addressGroup = document.getElementById('address-field-group');
-  const addressInput = document.getElementById('cust-address');
-
+  const extras = document.querySelectorAll('.extra-item');
   const BASE_PRICE = 18000;
 
-  const calculateTotal = () => {
-    let qty = parseInt(qtyInput.value) || 1;
+  const rupiah = (n) => `Rp ${n.toLocaleString('id-ID')}`;
+  const getQty = () => Math.min(50, Math.max(1, parseInt(qtyInput.value) || 1));
+  const getTotal = () => {
+    const qty = getQty();
     let total = qty * BASE_PRICE;
-
-    extraCheckboxes.forEach(cb => {
-      if (cb.checked) {
-        total += (parseInt(cb.getAttribute('data-price')) || 0) * qty;
-      }
+    extras.forEach((cb) => {
+      if (cb.checked) total += (parseInt(cb.dataset.price) || 0) * qty;
     });
-
-    if (livePriceEl) {
-      livePriceEl.textContent = `Rp ${total.toLocaleString('id-ID')}`;
-    }
+    return total;
   };
+  const refreshTotal = () => { livePrice.textContent = rupiah(getTotal()); };
 
-  if (btnMinus && btnPlus && qtyInput) {
-    btnMinus.addEventListener('click', () => {
-      let val = parseInt(qtyInput.value) || 1;
-      if (val > 1) {
-        qtyInput.value = val - 1;
-        calculateTotal();
-      }
-    });
+  $('btn-qty-minus').addEventListener('click', () => {
+    qtyInput.value = Math.max(1, getQty() - 1);
+    refreshTotal();
+  });
+  $('btn-qty-plus').addEventListener('click', () => {
+    qtyInput.value = Math.min(50, getQty() + 1);
+    refreshTotal();
+  });
+  extras.forEach((cb) => cb.addEventListener('change', refreshTotal));
 
-    btnPlus.addEventListener('click', () => {
-      let val = parseInt(qtyInput.value) || 1;
-      qtyInput.value = val + 1;
-      calculateTotal();
-    });
-  }
-
-  extraCheckboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
-
-  serviceCards.forEach(card => {
+  serviceCards.forEach((card) => {
     card.addEventListener('click', () => {
-      serviceCards.forEach(c => c.classList.remove('active'));
+      serviceCards.forEach((c) => c.classList.remove('active'));
       card.classList.add('active');
       const radio = card.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
 
-      const serviceType = card.getAttribute('data-service');
-      if (serviceType === 'delivery') {
-        addressGroup.style.display = 'flex';
-        addressInput.required = true;
-      } else {
-        addressGroup.style.display = 'none';
-        addressInput.required = false;
-        addressInput.value = '';
-      }
+      const isDelivery = card.dataset.service === 'delivery';
+      addressGroup.style.display = isDelivery ? 'flex' : 'none';
+      addressInput.required = isDelivery;
+      if (!isDelivery) addressInput.value = '';
     });
   });
 
-  if (waForm) {
-    waForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+  waForm.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-      const name = document.getElementById('cust-name').value.trim();
-      const qty = parseInt(qtyInput.value) || 1;
+    const name = $('cust-name').value.trim();
+    const qty = getQty();
+    const service = (document.querySelector('input[name="service-type"]:checked') || {}).value || 'Makan di Tempat';
+    const address = addressInput.value.trim();
+    const note = $('cust-note').value.trim();
+    const selected = [...extras].filter((cb) => cb.checked).map((cb) => cb.value);
 
-      let selectedService = "Makan di Tempat";
-      const activeRadio = document.querySelector('input[name="service-type"]:checked');
-      if (activeRadio) selectedService = activeRadio.value;
+    let msg = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
+    msg += `📋 *DETAIL PESANAN:*\n`;
+    msg += `• Menu Utama: *Crabprek Sambel Geprek*\n`;
+    msg += `• Jumlah: *${qty} Porsi*\n`;
+    msg += `• Layanan: *${service}*\n`;
+    if (selected.length) msg += `• Ekstra: ${selected.join(', ')}\n`;
+    msg += `• Total Est: *${rupiah(getTotal())}*\n\n`;
+    msg += `👤 *DATA PEMESAN:*\n`;
+    msg += `• Nama: ${name}\n`;
+    if (address) msg += `• Alamat/Lokasi Antar: ${address}\n`;
+    if (note) msg += `• Catatan: ${note}\n`;
+    msg += `\nMohon diproses ya kak. Terima kasih! 🦀🔥`;
 
-      const address = addressInput.value.trim();
-      const note = document.getElementById('cust-note').value.trim();
-
-      let selectedExtras = [];
-      extraCheckboxes.forEach(cb => {
-        if (cb.checked) selectedExtras.push(cb.value);
-      });
-
-      let currentTotalText = livePriceEl ? livePriceEl.textContent : `Rp ${(qty * BASE_PRICE).toLocaleString('id-ID')}`;
-
-      let waMessage = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
-      waMessage += `📋 *DETAIL PESANAN:*\n`;
-      waMessage += `• Menu Utama: *Crabprek Sambel Geprek*\n`;
-      waMessage += `• Jumlah: *${qty} Porsi*\n`;
-      waMessage += `• Layanan: *${selectedService}*\n`;
-      if (selectedExtras.length > 0) {
-        waMessage += `• Ekstra: ${selectedExtras.join(', ')}\n`;
-      }
-      waMessage += `• Total Est: *${currentTotalText}*\n\n`;
-
-      waMessage += `👤 *DATA PEMESAN:*\n`;
-      waMessage += `• Nama: ${name}\n`;
-      if (address) waMessage += `• Alamat/Lokasi Antar: ${address}\n`;
-      if (note) waMessage += `• Catatan: ${note}\n`;
-
-      waMessage += `\nMohon diproses ya kak. Terima kasih! 🦀🔥`;
-
-      const waUrl = `https://wa.me/6282362129646?text=${encodeURIComponent(waMessage)}`;
-      window.location.href = waUrl;
-    });
-  }
+    window.location.href = `https://wa.me/6282362129646?text=${encodeURIComponent(msg)}`;
+  });
 
   // --------------------------------------------------------------------------
-  // 4. MODAL JAM ANALOG
+  // 3. MODAL JAM ANALOG + DIGITAL (waktu WIB)
   // --------------------------------------------------------------------------
-  const clockTrigger = document.getElementById('trigger-clock-modal');
-  const clockModal = document.getElementById('clock-modal');
-  const btnCloseClock = document.getElementById('btn-close-clock');
-  const clockCanvas = document.getElementById('analog-clock-canvas');
-  const digitalClockText = document.getElementById('digital-clock-text');
+  const clockTrigger = $('trigger-clock-modal');
+  const clockModal = $('clock-modal');
+  const clockCanvas = $('analog-clock-canvas');
+  const digitalText = $('digital-clock-text');
+  let clockTimer = null;
 
-  let clockInterval = null;
+  const drawClock = () => {
+    const c = clockCanvas.getContext('2d');
+    const R = clockCanvas.width / 2;
+    const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+    const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
 
-  const drawAnalogClock = () => {
-    if (!clockCanvas) return;
-    const cCtx = clockCanvas.getContext('2d');
-    const radius = clockCanvas.width / 2;
+    digitalText.textContent = [h, m, s].map((n) => String(n).padStart(2, '0')).join(':') + ' WIB';
 
-    cCtx.clearRect(0, 0, clockCanvas.width, clockCanvas.height);
+    c.clearRect(0, 0, clockCanvas.width, clockCanvas.height);
+    c.save();
+    c.translate(R, R);
 
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
+    c.beginPath();
+    c.arc(0, 0, R - 8, 0, Math.PI * 2);
+    c.fillStyle = '#12141d';
+    c.fill();
+    c.lineWidth = 4;
+    c.strokeStyle = '#ff3b30';
+    c.stroke();
 
-    if (digitalClockText) {
-      const hStr = String(hours).padStart(2, '0');
-      const mStr = String(minutes).padStart(2, '0');
-      const sStr = String(seconds).padStart(2, '0');
-      digitalClockText.textContent = `${hStr}:${mStr}:${sStr} WIB`;
-    }
+    c.font = '28px sans-serif';
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText('🦀', 0, 0);
 
-    cCtx.save();
-    cCtx.translate(radius, radius);
-
-    cCtx.beginPath();
-    cCtx.arc(0, 0, radius - 8, 0, Math.PI * 2);
-    cCtx.fillStyle = '#12141d';
-    cCtx.fill();
-    cCtx.lineWidth = 4;
-    cCtx.strokeStyle = '#ff3b30';
-    cCtx.stroke();
-
-    cCtx.font = '28px sans-serif';
-    cCtx.textAlign = 'center';
-    cCtx.textBaseline = 'middle';
-    cCtx.fillText('🦀', 0, 0);
-
+    c.lineCap = 'round';
+    c.strokeStyle = '#ffb703';
+    c.lineWidth = 3;
     for (let i = 0; i < 12; i++) {
-      const ang = (i * Math.PI) / 6;
-      cCtx.beginPath();
-      cCtx.rotate(ang);
-      cCtx.moveTo(0, -(radius - 20));
-      cCtx.lineTo(0, -(radius - 12));
-      cCtx.strokeStyle = '#ffb703';
-      cCtx.lineWidth = 3;
-      cCtx.stroke();
-      cCtx.rotate(-ang);
+      c.save();
+      c.rotate((i * Math.PI) / 6);
+      c.beginPath();
+      c.moveTo(0, -(R - 20));
+      c.lineTo(0, -(R - 12));
+      c.stroke();
+      c.restore();
     }
 
-    const hourAng = ((hours % 12) * Math.PI) / 6 + (minutes * Math.PI) / 360;
-    cCtx.beginPath();
-    cCtx.rotate(hourAng);
-    cCtx.moveTo(0, 0);
-    cCtx.lineTo(0, -(radius * 0.5));
-    cCtx.strokeStyle = '#f8fafc';
-    cCtx.lineWidth = 5;
-    cCtx.stroke();
-    cCtx.rotate(-hourAng);
+    const hand = (angle, len, color, w, tail = 0) => {
+      c.save();
+      c.rotate(angle);
+      c.beginPath();
+      c.moveTo(0, tail);
+      c.lineTo(0, -len);
+      c.strokeStyle = color;
+      c.lineWidth = w;
+      c.stroke();
+      c.restore();
+    };
+    hand(((h % 12) * Math.PI) / 6 + (m * Math.PI) / 360, R * 0.5, '#f8fafc', 5);
+    hand((m * Math.PI) / 30 + (s * Math.PI) / 1800, R * 0.7, '#ffb703', 3);
+    hand((s * Math.PI) / 30, R * 0.82, '#ff3b30', 2, 10);
 
-    const minAng = (minutes * Math.PI) / 30 + (seconds * Math.PI) / 1800;
-    cCtx.beginPath();
-    cCtx.rotate(minAng);
-    cCtx.moveTo(0, 0);
-    cCtx.lineTo(0, -(radius * 0.7));
-    cCtx.strokeStyle = '#ffb703';
-    cCtx.lineWidth = 3;
-    cCtx.stroke();
-    cCtx.rotate(-minAng);
-
-    const secAng = (seconds * Math.PI) / 30;
-    cCtx.beginPath();
-    cCtx.rotate(secAng);
-    cCtx.moveTo(0, 10);
-    cCtx.lineTo(0, -(radius * 0.82));
-    cCtx.strokeStyle = '#ff3b30';
-    cCtx.lineWidth = 2;
-    cCtx.stroke();
-    cCtx.rotate(-secAng);
-
-    cCtx.restore();
+    c.restore();
   };
 
-  if (clockTrigger && clockModal) {
-    clockTrigger.addEventListener('click', () => {
-      clockModal.classList.add('active');
-      drawAnalogClock();
-      clockInterval = setInterval(drawAnalogClock, 1000);
-    });
+  const openClock = () => {
+    clockModal.classList.add('active');
+    drawClock();
+    clearInterval(clockTimer);
+    clockTimer = setInterval(drawClock, 1000);
+  };
+  const closeClock = () => {
+    clockModal.classList.remove('active');
+    clearInterval(clockTimer);
+  };
 
-    btnCloseClock.addEventListener('click', () => {
-      clockModal.classList.remove('active');
-      if (clockInterval) clearInterval(clockInterval);
-    });
-
-    clockModal.addEventListener('click', (e) => {
-      if (e.target === clockModal) {
-        clockModal.classList.remove('active');
-        if (clockInterval) clearInterval(clockInterval);
-      }
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // 5. PARALLAX 3D TILT
-  // --------------------------------------------------------------------------
-  const tiltCard = document.querySelector('.tilt-card');
-  if (tiltCard) {
-    tiltCard.addEventListener('mousemove', (e) => {
-      const rect = tiltCard.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-
-      const tiltX = (y / rect.height) * -12;
-      const tiltY = (x / rect.width) * 12;
-
-      tiltCard.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-    });
-
-    tiltCard.addEventListener('mouseleave', () => {
-      tiltCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // 6. NAVBAR SCROLL & REVEAL
-  // --------------------------------------------------------------------------
-  const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 40) {
-      navbar.style.background = 'rgba(8, 9, 13, 0.96)';
-      navbar.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.6)';
-      navbar.style.height = '70px';
-    } else {
-      navbar.style.background = 'rgba(8, 9, 13, 0.85)';
-      navbar.style.boxShadow = 'none';
-      navbar.style.height = '80px';
-    }
+  clockTrigger.addEventListener('click', openClock);
+  clockTrigger.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openClock(); }
+  });
+  $('btn-close-clock').addEventListener('click', closeClock);
+  clockModal.addEventListener('click', (e) => { if (e.target === clockModal) closeClock(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && clockModal.classList.contains('active')) closeClock();
   });
 
-  const reveals = document.querySelectorAll('.reveal');
+  // --------------------------------------------------------------------------
+  // 4. TILT KARTU PRODUK (hanya perangkat dengan kursor)
+  // --------------------------------------------------------------------------
+  const tiltCard = document.querySelector('.tilt-card');
+  if (tiltCard && window.matchMedia('(hover: hover)').matches) {
+    tiltCard.addEventListener('mousemove', (e) => {
+      const r = tiltCard.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width / 2;
+      const y = e.clientY - r.top - r.height / 2;
+      tiltCard.style.transform = `perspective(1000px) rotateX(${(y / r.height) * -5}deg) rotateY(${(x / r.width) * 5}deg)`;
+    });
+    tiltCard.addEventListener('mouseleave', () => {
+      tiltCard.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // 5. NAVBAR, SCROLLSPY & HORIZONTAL SCROLLER (geser mouse / sentuhan)
+  // --------------------------------------------------------------------------
+  const navbar = $('navbar');
+  const nav = $('main-nav');
+  const navLinks = [...nav.querySelectorAll('a')];
+
+  const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 24);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Tandai tepi yang masih bisa digeser (memunculkan fade di sisi tersebut)
+  const updateEdges = (el) => {
+    const max = el.scrollWidth - el.clientWidth;
+    el.classList.toggle('can-l', el.scrollLeft > 4);
+    el.classList.toggle('can-r', el.scrollLeft < max - 4);
+  };
+
+  // Sentuhan memakai scroll native; mouse memakai drag-to-scroll
+  const enableDragScroll = (el) => {
+    let down = false, moved = false, startX = 0, startLeft = 0;
+
+    el.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      down = true;
+      moved = false;
+      startX = e.clientX;
+      startLeft = el.scrollLeft;
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (!down) return;
+      const dx = e.clientX - startX;
+      if (!moved && Math.abs(dx) > 5) { moved = true; el.classList.add('dragging'); }
+      if (moved) el.scrollLeft = startLeft - dx;
+    });
+    const end = () => { down = false; el.classList.remove('dragging'); };
+    window.addEventListener('pointerup', end);
+    window.addEventListener('pointercancel', end);
+
+    // Cegah klik link/kartu yang tidak sengaja setelah drag
+    el.addEventListener('click', (e) => {
+      if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; }
+    }, true);
+
+    el.addEventListener('scroll', () => updateEdges(el), { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(() => updateEdges(el)).observe(el);
+    window.addEventListener('load', () => updateEdges(el));
+    updateEdges(el);
+  };
+
+  enableDragScroll(nav);
+  const infoScroller = $('info-scroller');
+  if (infoScroller) enableDragScroll(infoScroller);
+
+  // Scrollspy: menu aktif mengikuti section dan otomatis berada di tengah navigasi
+  let current = null;
+  const setActive = (id) => {
+    if (id === current) return;
+    current = id;
+    navLinks.forEach((a) => {
+      const on = a.getAttribute('href') === `#${id}`;
+      a.classList.toggle('active', on);
+      if (on && nav.scrollWidth > nav.clientWidth) {
+        nav.scrollTo({ left: a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' });
+      }
+    });
+  };
+
+  const spy = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) setActive(en.target.id); });
+  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0 });
+  navLinks
+    .map((a) => document.querySelector(a.getAttribute('href')))
+    .filter(Boolean)
+    .forEach((sec) => spy.observe(sec));
+
+  // --------------------------------------------------------------------------
+  // 6. REVEAL SAAT SCROLL
+  // --------------------------------------------------------------------------
   const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('active');
+    entries.forEach((en) => {
+      if (en.isIntersecting) {
+        en.target.classList.add('active');
+        revealObserver.unobserve(en.target);
       }
     });
   }, { threshold: 0.12 });
-
-  reveals.forEach(el => revealObserver.observe(el));
-
+  document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
 });

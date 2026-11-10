@@ -120,15 +120,13 @@ button {
 }
 
 .logo-wrapper {
-  width: 46px;
-  height: 46px;
+  height: 40px; 
+  width: auto; /* Membiarkan lebar menyesuaikan logo asli */
   background: transparent;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  flex: 0 0 auto;
 }
 
 .logo-img {
@@ -1061,7 +1059,7 @@ button {
 
 .reveal {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(15px); /* Diperkecil dari 30px agar lebih dekat */
   transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .reveal.active { opacity: 1; transform: translateY(0); }
@@ -1241,4 +1239,35 @@ button {
 .btn-remove-item:hover {
   color: var(--crab-red);
   transform: scale(1.2);
+}
+
+/* Tombol Order Melayang Khusus HP */
+.floating-order-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: linear-gradient(135deg, var(--crab-red), var(--seafood-orange));
+  color: white;
+  padding: 14px 24px;
+  border-radius: 50px;
+  font-weight: 900;
+  font-size: 14px;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(255, 64, 56, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.3s ease;
+}
+
+.floating-order-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+}
+
+/* Sembunyikan tombol melayang ini di Laptop, karena di Laptop navigasi atas sudah jelas */
+@media (min-width: 851px) {
+  .floating-order-btn {
+    display: none;
+  }
 }

@@ -461,7 +461,10 @@ document.addEventListener('DOMContentLoaded', () => {
       entries.forEach(entry => {
         if (entry.isIntersecting) { entry.target.classList.add('active'); revealObserver.unobserve(entry.target); }
       });
-    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+    }, { 
+      threshold: 0.05, 
+      rootMargin: "0px 0px 50px 0px" // Diubah: elemen akan muncul 50px SEBELUM masuk ke layar
+    });
     revealElements.forEach(el => revealObserver.observe(el));
   }
 

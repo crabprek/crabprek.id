@@ -110,12 +110,11 @@
     </div>
   </section>
 
-  <!-- Product Showcase Section -->
+<!-- Product Showcase Section -->
   <section id="product" class="section">
     <div class="section-header">
       <span class="section-tag">KATALOG MENU UTAMA</span>
       <h2>Dua Racikan Utama <span class="gradient-text">Yang Bikin Nagih</span></h2>
-      <p>Harga tertera adalah harga <strong>PAKET LENGKAP</strong>. Tidak ada biaya tersembunyi, porsi pasti mengenyangkan.</p>
     </div>
 
     <div class="product-grid">
@@ -130,16 +129,15 @@
           <span class="product-category">AUTHENTIC CRAFTED RECIPE</span>
           <h3>Crabprek Sambal Geprek</h3>
           <p class="product-desc">
-            Kepiting olahan segar yang digoreng renyah di luar dan empuk di dalam, lalu digeprek dengan ulekan Sambal Geprek khas Crabprek yang gurih dan pedas mantap.
+            Kepiting renyah di luar, empuk di dalam. Digeprek dengan sambal ulek khas Crabprek yang gurih dan pedas mantap.
           </p>
 
           <div class="package-info-box">
-            <strong>Cukup Rp17.000, Anda sudah mendapatkan:</strong>
             <ul class="product-includes-list">
-              <li>🦀 1 Porsi Kepiting Renyah Utuh</li>
+              <li>🦀 Kepiting Renyah Utuh</li>
               <li>🍚 Nasi Putih Hangat</li>
-              <li>🔥 Sambal Geprek Khas Crabprek</li>
-              <li>🧈 Tahu & Tempe Goreng + Lalapan</li>
+              <li>🔥 Sambal Geprek Khas</li>
+              <li>🧈 Tahu Tempe + Lalapan</li>
             </ul>
           </div>
 
@@ -148,7 +146,7 @@
               <span class="price-old">Rp18.000</span>
               <strong class="price-new">Rp17.000</strong>
             </div>
-            <a href="#order-form" class="btn btn-primary btn-product-wa">Pilih Menu Ini 🛒</a>
+            <button type="button" class="btn btn-primary btn-product-wa" onclick="document.getElementById('order-form').scrollIntoView({behavior: 'smooth'})">Pilih Menu 🛒</button>
           </div>
         </div>
       </article>
@@ -164,16 +162,15 @@
           <span class="product-category">FRESH & SPICY SENSATION</span>
           <h3>Crabprek Sambal Matah</h3>
           <p class="product-desc">
-            Kepiting renyah dengan siraman sambal matah segar dari irisan bawang merah, cabai, dan serai. Rasa pedasnya gurih dan ringan, cocok untuk pencinta sensasi baru.
+            Kepiting renyah dengan siraman sambal matah segar (irisan bawang, cabai, serai). Pedasnya gurih dan ringan.
           </p>
 
           <div class="package-info-box">
-            <strong>Cukup Rp17.000, Anda sudah mendapatkan:</strong>
             <ul class="product-includes-list">
-              <li>🦀 1 Porsi Kepiting Renyah Utuh</li>
+              <li>🦀 Kepiting Renyah Utuh</li>
               <li>🍚 Nasi Putih Hangat</li>
-              <li>🌿 Sambal Matah Segar Khas</li>
-              <li>🧈 Tahu & Tempe Goreng + Lalapan</li>
+              <li>🌿 Sambal Matah Segar</li>
+              <li>🧈 Tahu Tempe + Lalapan</li>
             </ul>
           </div>
 
@@ -182,7 +179,7 @@
               <span class="price-old">Rp18.000</span>
               <strong class="price-new">Rp17.000</strong>
             </div>
-            <a href="#order-form" class="btn btn-primary btn-product-wa">Pilih Menu Ini 🛒</a>
+            <button type="button" class="btn btn-primary btn-product-wa" onclick="document.getElementById('order-form').scrollIntoView({behavior: 'smooth'})">Pilih Menu 🛒</button>
           </div>
         </div>
       </article>
@@ -331,7 +328,7 @@
       </form>
     </div>
   </section>
-  
+
   <!-- Location & Operating Hours Section -->
   <section id="info" class="section">
     <div class="info-card-box reveal">
@@ -416,5 +413,10 @@
   </div>
 
   <script src="script.js"></script>
+
+  <!-- Tombol Pintas Melayang untuk HP -->
+  <a href="#order-form" class="floating-order-btn">
+    🛒 Pesan Sekarang
+  </a>
 </body>
 </html>

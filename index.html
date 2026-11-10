@@ -253,65 +253,57 @@
       <div class="section-header">
         <span class="section-tag">PEMESANAN ONLINE INSTAN</span>
         <h2>Formulir Pesanan <span class="gradient-text">CRABPREK</span></h2>
-        <p>Pilih produk dan jenis pesanan. Alamat pengiriman hanya perlu diisi jika memilih layanan Delivery.</p>
+        <p>Pilih produk dan jenis pesanan. Alamat pengiriman hanya perlu diisi jika memilih Delivery.</p>
       </div>
 
       <form id="wa-order-form" class="order-form">
         <div class="form-grid">
 
-          <!-- Nama Pemesan -->
-          <div class="form-group full-width">
+          <!-- 1. Nama Pemesan (Modern Floating Label) -->
+          <div class="form-group full-width form-floating">
+            <input type="text" id="cust-name" placeholder=" " required />
             <label for="cust-name">Nama Pemesan / Pembeli *</label>
-            <input type="text" id="cust-name" placeholder="Masukkan nama Anda..." required />
           </div>
 
-          <!-- Pilihan Produk -->
+          <!-- 2. Pilihan Produk (Modern Bouncy Cards) -->
           <div class="form-group full-width">
-            <label>Pilih Produk *</label>
+            <span class="modern-label">Pilih Produk Utama *</span>
             <div class="product-options-grid">
               <label class="product-option active" data-product="geprek">
                 <input type="radio" name="product-type" value="Crabprek Sambal Geprek" checked />
-                <img
-                  src="crabprek-sambel-geprek.jpg"
-                  alt=""
-                  loading="lazy"
-                  onerror="this.style.display='none';"
-                />
-                <span>
+                <img src="crabprek-sambel-geprek.jpg" alt="Sambal Geprek" loading="lazy" onerror="this.style.display='none';" />
+                <div class="option-info">
                   <strong>Sambal Geprek</strong>
                   <small>Rp17.000</small>
-                </span>
+                </div>
+                <div class="check-indicator">✓</div>
               </label>
 
               <label class="product-option" data-product="matah">
                 <input type="radio" name="product-type" value="Crabprek Sambal Matah" />
-                <img
-                  src="crabprek-sambal-matah.jpg"
-                  alt=""
-                  loading="lazy"
-                  onerror="this.style.display='none';"
-                />
-                <span>
+                <img src="crabprek-sambal-matah.jpg" alt="Sambal Matah" loading="lazy" onerror="this.style.display='none';" />
+                <div class="option-info">
                   <strong>Sambal Matah</strong>
                   <small>Rp17.000</small>
-                </span>
+                </div>
+                <div class="check-indicator">✓</div>
               </label>
             </div>
           </div>
 
-          <!-- Counter Kuantitas Interaktif -->
-          <div class="form-group full-width">
-            <label>Jumlah Porsi *</label>
-            <div class="qty-counter-wrapper">
+          <!-- 3. Counter Kuantitas Interaktif -->
+          <div class="form-group full-width align-center">
+            <span class="modern-label">Jumlah Porsi *</span>
+            <div class="qty-counter-wrapper modern-qty">
               <button type="button" class="btn-qty-step" id="btn-qty-minus" aria-label="Kurangi porsi">−</button>
               <input type="number" id="cust-qty" min="1" max="50" value="1" readonly />
               <button type="button" class="btn-qty-step" id="btn-qty-plus" aria-label="Tambah porsi">+</button>
             </div>
           </div>
 
-          <!-- Card Tipe Layanan -->
+          <!-- 4. Card Tipe Layanan -->
           <div class="form-group full-width">
-            <label>Pilih Jenis Pesanan *</label>
+            <span class="modern-label">Pilih Jenis Pesanan *</span>
             <div class="service-cards-grid">
               <label class="service-card active" data-service="dinein">
                 <input type="radio" name="service-type" value="Makan di Tempat (Stand Batang Agam)" checked />
@@ -330,52 +322,52 @@
               <label class="service-card" data-service="delivery">
                 <input type="radio" name="service-type" value="Pesan Antar / Delivery Payakumbuh" />
                 <span class="s-icon">🛵</span>
-                <strong>Pesan Antar (Delivery)</strong>
+                <strong>Pesan Antar</strong>
                 <small>Area Payakumbuh</small>
               </label>
             </div>
           </div>
 
-          <!-- Ekstra Tambahan Checkbox -->
+          <!-- 5. Ekstra Tambahan (Modern Pill Toggles) -->
           <div class="form-group full-width">
-            <label>Ekstra Tambahan (Opsional):</label>
+            <span class="modern-label">Ekstra Tambahan (Opsional)</span>
             <div class="extras-grid">
               <label class="extra-chip">
                 <input type="checkbox" value="Ekstra Sambal Geprek (+Rp 1.000)" data-price="1000" class="extra-item" />
-                <span>🌶️ Ekstra Sambal Geprek (+Rp 1k)</span>
+                <span>🌶️ Ekstra Sambal (+Rp 1k)</span>
               </label>
               <label class="extra-chip">
                 <input type="checkbox" value="Ekstra Nasi Putih (+Rp 2.000)" data-price="2000" class="extra-item" />
-                <span>🍚 Ekstra Nasi Putih (+Rp 2k)</span>
+                <span>🍚 Ekstra Nasi (+Rp 2k)</span>
               </label>
               <label class="extra-chip">
                 <input type="checkbox" value="Ekstra Tahu & Tempe (+Rp 1.000)" data-price="1000" class="extra-item" />
-                <span>🧈 Ekstra Tahu & Tempe (+Rp 1k)</span>
+                <span>🧈 Tahu Tempe (+Rp 1k)</span>
               </label>
             </div>
           </div>
 
-          <!-- Alamat Pengiriman (Kondisional Delivery) -->
-          <div class="form-group full-width" id="address-field-group" style="display: none;">
-            <label for="cust-address">Alamat Pengiriman / Patokan Lokasi Antar *</label>
-            <input type="text" id="cust-address" placeholder="Contoh: Jl. Sudirman No. 12, dekat Masjid Agung..." />
+          <!-- 6. Alamat Pengiriman (Floating Label) -->
+          <div class="form-group full-width form-floating" id="address-field-group" style="display: none;">
+            <input type="text" id="cust-address" placeholder=" " />
+            <label for="cust-address">Alamat Lengkap / Patokan Pengiriman *</label>
           </div>
 
-          <!-- Catatan Khusus -->
-          <div class="form-group full-width">
-            <label for="cust-note">Catatan Khusus (Opsional)</label>
-            <textarea id="cust-note" rows="2" placeholder="Contoh: Sambal dipisah, dll..."></textarea>
+          <!-- 7. Catatan Khusus (Floating Label) -->
+          <div class="form-group full-width form-floating">
+            <textarea id="cust-note" rows="2" placeholder=" "></textarea>
+            <label for="cust-note">Catatan Khusus (Ops. Cth: Sambal dipisah)</label>
           </div>
 
         </div>
 
-        <!-- Summary & Tombol Kirim WA -->
-        <div class="order-summary-box">
+        <!-- 8. Summary Sticky-like Box -->
+        <div class="order-summary-box modern-summary">
           <div class="summary-text">
-            <span>Total Pembayaran Est:</span>
+            <span>Total Estimasi:</span>
             <strong id="live-total-price">Rp 17.000</strong>
           </div>
-          <button type="submit" class="btn btn-primary btn-large btn-submit-wa">
+          <button type="submit" class="btn btn-primary btn-large btn-submit-wa glowing-btn">
             Kirim Pesanan 💬
           </button>
         </div>

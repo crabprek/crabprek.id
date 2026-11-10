@@ -738,7 +738,7 @@ button {
 }
 
 /* ==========================================================================
-   ORDER FORM
+   ORDER FORM - MODERN APP STYLE
    ========================================================================== */
 
 .order-card-wrapper {
@@ -750,239 +750,273 @@ button {
   -webkit-backdrop-filter: blur(16px);
   max-width: 880px;
   margin: 0 auto;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
-}
-
-.order-form {
-  margin-top: 20px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
+  grid-template-columns: 1fr;
+  gap: 24px;
 }
 
 .form-group.full-width {
-  grid-column: span 2;
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.form-group label {
+.modern-label {
   font-size: 13px;
   font-weight: 800;
   color: var(--text-main);
+  letter-spacing: 0.5px;
 }
 
-.form-group input[type="text"],
-.form-group textarea {
-  width: 100%;
-  background: rgba(10, 12, 18, 0.82);
-  border: 1px solid var(--border-glass);
-  border-radius: 12px;
-  padding: 12px 16px;
-  color: var(--text-main);
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: rgba(168, 162, 154, 0.68);
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-  border-color: var(--crab-red);
-  box-shadow: 0 0 0 3px rgba(255, 64, 56, 0.12);
-}
-
-/* Product options in form */
-.product-options-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.product-option {
+/* 1. Floating Labels untuk Input & Textarea */
+.form-floating {
   position: relative;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(10, 12, 18, 0.65);
-  border: 1px solid var(--border-glass);
-  cursor: pointer;
+  width: 100%;
+}
+
+.form-floating input,
+.form-floating textarea {
+  width: 100%;
+  background: rgba(10, 12, 18, 0.5);
+  border: 2px solid rgba(245, 235, 221, 0.15);
+  border-radius: 14px;
+  padding: 20px 16px 12px;
+  color: #fff;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
   transition: all 0.3s ease;
 }
 
-.product-option input[type="radio"] {
+.form-floating textarea {
+  resize: none;
+}
+
+.form-floating label {
   position: absolute;
-  opacity: 0;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.product-option img {
-  width: 54px;
-  height: 54px;
-  border-radius: 12px;
-  object-fit: cover;
-  flex: 0 0 auto;
-  background: rgba(255, 64, 56, 0.08);
+.form-floating textarea + label {
+  top: 24px;
 }
 
-.product-option strong {
-  display: block;
-  font-size: 13px;
-  color: var(--text-main);
+/* Animasi saat input diklik atau diisi */
+.form-floating input:focus,
+.form-floating input:not(:placeholder-shown),
+.form-floating textarea:focus,
+.form-floating textarea:not(:placeholder-shown) {
+  border-color: var(--seafood-orange);
+  background: rgba(255, 138, 36, 0.03);
+  box-shadow: 0 0 0 4px rgba(255, 138, 36, 0.1);
 }
 
-.product-option small {
-  display: block;
-  font-size: 12px;
-  font-weight: 800;
+.form-floating input:focus + label,
+.form-floating input:not(:placeholder-shown) + label,
+.form-floating textarea:focus + label,
+.form-floating textarea:not(:placeholder-shown) + label {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
+  left: 12px;
+  background: #101217;
+  padding: 0 6px;
   color: var(--seafood-orange);
-  margin-top: 2px;
+  font-weight: 800;
 }
 
-.product-option.active {
-  border-color: var(--crab-red);
-  background: rgba(255, 64, 56, 0.10);
-  box-shadow: 0 4px 18px rgba(255, 64, 56, 0.16);
+/* 2. Modern Bouncy Cards (Produk & Layanan) */
+.product-options-grid, .service-cards-grid {
+  display: grid;
+  gap: 14px;
 }
+.product-options-grid { grid-template-columns: 1fr 1fr; }
+.service-cards-grid { grid-template-columns: repeat(3, 1fr); }
 
-/* Quantity Counter */
-.qty-counter-wrapper {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(10, 12, 18, 0.90);
-  border: 1px solid var(--border-glass);
-  border-radius: 50px;
-  padding: 4px;
-  width: fit-content;
-}
-
-.btn-qty-step {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: var(--crab-red);
-  color: #fff;
-  font-size: 20px;
-  font-weight: 900;
+.product-option, .service-card {
+  position: relative;
+  background: rgba(10, 12, 18, 0.6);
+  border: 2px solid rgba(245, 235, 221, 0.1);
+  border-radius: 18px;
+  padding: 16px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.btn-qty-step:hover {
-  background: var(--seafood-orange);
-  transform: scale(1.04);
-}
-
-.qty-counter-wrapper input {
-  width: 60px;
-  text-align: center;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 900;
-  outline: none;
-}
-
-/* Service Type Cards */
-.service-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
+  gap: 14px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efek membal (bouncy) */
 }
 
 .service-card {
-  position: relative;
-  background: rgba(10, 12, 18, 0.62);
-  border: 1px solid var(--border-glass);
-  border-radius: 16px;
-  padding: 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
   flex-direction: column;
-  align-items: center;
+  text-align: center;
 }
 
+.product-option input[type="radio"],
 .service-card input[type="radio"] {
   position: absolute;
   opacity: 0;
 }
 
-.service-card .s-icon {
-  font-size: 28px;
-  margin-bottom: 6px;
+.product-option img {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
-.service-card strong {
-  font-size: 13px;
+.option-info strong, .service-card strong {
   display: block;
-  color: var(--text-main);
+  font-size: 14px;
+  color: #fff;
 }
 
-.service-card small {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.service-card.active {
-  border-color: var(--crab-red);
-  background: rgba(255, 64, 56, 0.11);
-  box-shadow: 0 4px 16px rgba(255, 64, 56, 0.18);
-}
-
-/* Extras */
-.extras-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.extra-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 50px;
-  background: rgba(10, 12, 18, 0.62);
-  border: 1px solid var(--border-glass);
-  cursor: pointer;
+.option-info small, .service-card small {
+  display: block;
   font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* Hover State */
+.product-option:hover, .service-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 138, 36, 0.4);
+}
+
+/* Active State - Neon Glow */
+.product-option.active, .service-card.active {
+  background: rgba(255, 138, 36, 0.08);
+  border-color: var(--seafood-orange);
+  transform: scale(1.03);
+  box-shadow: 0 12px 24px rgba(255, 138, 36, 0.2);
+}
+
+.product-option.active .option-info small, 
+.service-card.active small {
+  color: var(--seafood-orange);
+  font-weight: 800;
+}
+
+/* Check Indicator khusus Produk */
+.check-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  background: var(--seafood-orange);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  opacity: 0;
+  transform: scale(0);
   transition: all 0.3s ease;
 }
 
+.product-option.active .check-indicator {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 3. Modern Qty Counter */
+.modern-qty {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(10, 12, 18, 0.8);
+  border: 2px solid rgba(245, 235, 221, 0.15);
+  border-radius: 50px;
+  padding: 6px;
+}
+
+.btn-qty-step {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 20px;
+  transition: all 0.2s ease;
+}
+
+.btn-qty-step:hover {
+  background: var(--crab-red);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(255, 64, 56, 0.4);
+}
+
+.modern-qty input {
+  width: 60px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: var(--seafood-orange);
+  font-size: 20px;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+/* 4. Modern Pill Toggles (Ekstra Tambahan) */
+.extras-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.extra-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-radius: 50px;
+  background: rgba(10, 12, 18, 0.6);
+  border: 2px solid rgba(245, 235, 221, 0.1);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
 .extra-chip input {
-  accent-color: var(--crab-red);
+  position: absolute;
+  opacity: 0;
+}
+
+.extra-chip:hover {
+  border-color: rgba(215, 243, 74, 0.4);
+  color: #fff;
 }
 
 .extra-chip:has(input:checked) {
-  border-color: rgba(215, 243, 74, 0.6);
-  background: rgba(215, 243, 74, 0.08);
+  border-color: var(--lime);
+  background: rgba(215, 243, 74, 0.1);
   color: var(--lime);
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(215, 243, 74, 0.15);
 }
 
-.order-summary-box {
-  margin-top: 30px;
-  padding-top: 24px;
-  border-top: 1px solid var(--border-glass);
+/* 5. Summary & Submit Button */
+.modern-summary {
+  margin-top: 40px;
+  padding: 24px;
+  background: rgba(10, 12, 18, 0.8);
+  border: 1px solid rgba(255, 138, 36, 0.2);
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -992,19 +1026,42 @@ button {
 
 .summary-text span {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-muted);
+  margin-bottom: 4px;
 }
 
 .summary-text strong {
-  font-size: 28px;
+  font-size: 32px;
   color: var(--seafood-orange);
   font-weight: 900;
 }
 
-.btn-submit-wa {
-  padding: 16px 36px;
-  font-size: 15px;
+.glowing-btn {
+  padding: 18px 36px;
+  font-size: 16px;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--crab-red), var(--seafood-orange));
+  color: #fff;
+  border: none;
+  font-weight: 900;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(255, 64, 56, 0.3);
+  transition: all 0.3s ease;
+}
+
+.glowing-btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(255, 64, 56, 0.5);
+}
+
+/* Responsive adjustments for Form */
+@media (max-width: 850px) {
+  .product-options-grid { grid-template-columns: 1fr; }
+  .service-cards-grid { grid-template-columns: 1fr; }
+  .modern-summary { flex-direction: column; text-align: center; }
+  .glowing-btn { width: 100%; }
 }
 
 /* ==========================================================================

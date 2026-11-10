@@ -28,6 +28,16 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent; /* Menghapus efek kotak biru saat disentuh di HP */
+}
+
+/* Tambahkan kode ini di bawahnya untuk menghapus garis biru di PC */
+a, button, input, textarea, label, .product-option, .service-card {
+  outline: none !important;
+}
+
+*:focus {
+  outline: none !important;
 }
 
 html {
@@ -41,11 +51,14 @@ html {
 body {
   min-height: 100vh;
   overflow-x: hidden;
+  /* MENGUBAH GRADIENT BACKGROUND:
+     Membuat warna dasar lebih gelap (Midnight Black/Navy Black)
+     dan memusatkan pendar warna aksen hanya di titik-titik krusial */
   background:
-    radial-gradient(circle at 12% 8%, rgba(255, 64, 56, 0.12), transparent 30%),
-    radial-gradient(circle at 88% 14%, rgba(255, 138, 36, 0.10), transparent 28%),
-    radial-gradient(circle at 50% 100%, rgba(215, 243, 74, 0.04), transparent 36%),
-    linear-gradient(180deg, #08090B 0%, #0B0C10 52%, #08090B 100%);
+    radial-gradient(circle at 15% 10%, rgba(215, 243, 74, 0.08), transparent 35%), /* Lime accent */
+    radial-gradient(circle at 85% 20%, rgba(255, 64, 56, 0.06), transparent 40%),  /* Red accent */
+    radial-gradient(circle at 50% 110%, rgba(255, 138, 36, 0.12), transparent 45%), /* Orange accent */
+    linear-gradient(180deg, #030406 0%, #0A0C11 40%, #030406 100%); /* Base ultra-dark */
 }
 
 body::before {
@@ -54,13 +67,13 @@ body::before {
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.55;
+  opacity: 0.75; /* Menaikkan opacity grid agar sedikit lebih terlihat di atas latar gelap */
   background-image:
-    linear-gradient(rgba(245, 235, 221, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(245, 235, 221, 0.022) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 72%);
-  -webkit-mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 72%);
+    linear-gradient(rgba(245, 235, 221, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 235, 221, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px; /* Rapatkan sedikit grid-nya untuk tekstur lebih padat */
+  mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 85%);
+  -webkit-mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 85%);
 }
 
 img {
@@ -157,9 +170,8 @@ button {
 .logo-wrapper {
   width: 46px;
   height: 46px;
-  border-radius: 14px;
-  background: rgba(245, 235, 221, 0.055);
-  border: 1px solid rgba(245, 235, 221, 0.08);
+  background: transparent; /* Menghilangkan warna background bawaan web */
+  border: none; /* Menghilangkan garis pembungkus */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -595,9 +607,7 @@ button {
 .product-media-box {
   position: relative;
   height: 330px;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(255, 64, 56, 0.16), transparent 62%),
-    #0D0E12;
+  background: #0D0E12; /* Dibuat gelap solid agar fokus ke gambar */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -607,8 +617,8 @@ button {
 .product-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  padding: 10px;
+  object-fit: cover; /* Membuat gambar memenuhi seluruh bingkai tanpa sisa */
+  padding: 0; /* Menghapus jarak margin/padding di dalam bingkai */
   transition: transform 0.55s ease;
 }
 

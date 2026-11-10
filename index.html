@@ -3,34 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="CRABPREK — Sensasi Seafood Geprek, Padehnyo Mupakaik! Kepiting renyah dengan Sambal Geprek & Sambal Matah khas Crabprek, Payakumbuh." />
   <title>CRABPREK — Sensasi Seafood Geprek, Padehnyo Mupakaik!</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <!-- Custom Cursor Particle Canvas -->
-  <canvas id="trail-canvas"></canvas>
+  <canvas id="trail-canvas" aria-hidden="true"></canvas>
 
   <!-- Ambient Light Orbs -->
-  <div class="glow-orb orb-1"></div>
-  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-1" aria-hidden="true"></div>
+  <div class="glow-orb orb-2" aria-hidden="true"></div>
+  <div class="glow-orb orb-3" aria-hidden="true"></div>
 
   <!-- Navbar Glassmorphism -->
   <header class="navbar" id="navbar">
-    <a href="#" class="logo">
+    <a href="#" class="logo" aria-label="CRABPREK Beranda">
       <div class="logo-wrapper">
-        <img src="logo.png" alt="Logo CRABPREK" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+        <img
+          src="logo.png"
+          alt="Logo CRABPREK"
+          class="logo-img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
+        />
         <span class="logo-fallback-icon">🦀</span>
       </div>
       <span class="logo-text">CRAB<span>PREK</span></span>
     </a>
-    <nav class="nav-links">
+
+    <nav class="nav-links" id="nav-links" aria-label="Navigasi utama">
       <a href="#hero">Beranda</a>
       <a href="#product">Menu Utama</a>
       <a href="#order-form">Pesan Langsung</a>
       <a href="#info">Lokasi & Jam</a>
     </nav>
+
     <a href="#order-form" class="btn-nav">Pesan WA 💬</a>
+
+    <button
+      type="button"
+      class="nav-toggle"
+      id="nav-toggle"
+      aria-label="Buka menu navigasi"
+      aria-expanded="false"
+      aria-controls="nav-links"
+    >
+      ☰
+    </button>
   </header>
 
   <!-- Hero Section -->
@@ -41,17 +61,27 @@
           <span class="pulse-dot"></span>
           OPEN EVERYDAY • 07.00 - 18.00 WIB
         </div>
+
         <h1 class="hero-title">
           Sensasi Seafood Geprek, <br />
           <span class="gradient-text">Padehnyo Mupakaik!</span>
         </h1>
+
         <p class="hero-subtitle">
-          Satu-satunya kepiting renyah di Payakumbuh yang bisa dimakan langsung tanpa ribet kupas cangkang! Digeprek dengan Sambal Geprek khas racikan Crabprek, disajikan hangat bareng Nasi Putih, Tahu, Tempe, & Lalapan.
+          Satu-satunya kepiting renyah di Payakumbuh yang bisa dimakan langsung tanpa ribet kupas cangkang!
+          Digeprek dengan Sambal Geprek khas Crabprek, disajikan hangat bareng Nasi Putih, Tahu, Tempe, & Lalapan.
         </p>
 
         <div class="hero-buttons">
           <a href="#order-form" class="btn btn-primary">Lihat Harga & Pesan 📱</a>
-          <a href="https://maps.app.goo.gl/11KsLJGESKKFnYJp6" target="_blank" rel="noopener" class="btn btn-outline">Lokasi Stand Batang Agam 📍</a>
+          <a
+            href="https://maps.app.goo.gl/11KsLJGESKKFnYJp6"
+            target="_blank"
+            rel="noopener"
+            class="btn btn-outline"
+          >
+            Lokasi Stand Batang Agam 📍
+          </a>
         </div>
 
         <div class="hero-stats">
@@ -66,8 +96,8 @@
           </div>
           <div class="stat-divider"></div>
           <div class="stat-box">
-            <span class="stat-number">Sambal Geprek</span>
-            <span class="stat-label">Racikan Khas Crabprek</span>
+            <span class="stat-number">2 Sambal</span>
+            <span class="stat-label">Geprek & Matah Khas Crabprek</span>
           </div>
         </div>
       </div>
@@ -75,6 +105,7 @@
       <!-- Hero Visual Stage Canvas 3D -->
       <div class="hero-visual-stage">
         <canvas id="hero-canvas"></canvas>
+
         <div class="floating-card badge-top">
           <span class="badge-icon">✨</span>
           <div>
@@ -82,11 +113,27 @@
             <small>Sentuh / Gerakkan Kursor!</small>
           </div>
         </div>
+
         <div class="floating-card badge-bottom">
           <span class="badge-icon">📍</span>
           <div>
             <strong>Taman Batang Agam</strong>
             <small>Payakumbuh • 07.00 - 18.00 WIB</small>
+          </div>
+        </div>
+
+        <div class="hero-product-preview">
+          <img
+            src="crabprek-sambel-geprek.jpg"
+            alt="Crabprek Sambal Geprek"
+            loading="eager"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="hero-preview-fallback">🦀</div>
+          <div class="hero-preview-copy">
+            <span>Best Seller</span>
+            <strong>Sambal Geprek</strong>
+            <small>Rp17.000</small>
           </div>
         </div>
       </div>
@@ -97,43 +144,106 @@
   <section id="product" class="section">
     <div class="section-header">
       <span class="section-tag">MENU MASTERPIECE KEBANGGAAN</span>
-      <h2>Racikan Utama <span class="gradient-text">Yang Bikin Nagih</span></h2>
-      <p>Menu ikonik pilihan utama pecinta kuliner seafood pedas di Payakumbuh.</p>
+      <h2>Dua Racikan Utama <span class="gradient-text">Yang Bikin Nagih</span></h2>
+      <p>Pilih karakter pedas favoritmu: gurih pedas Sambal Geprek atau segar pedas Sambal Matah.</p>
     </div>
 
-    <div class="product-showcase reveal tilt-card">
-      <div class="product-media-box">
-        <div class="product-badge-glow">BEST SELLER</div>
-        <img src="crabprek-sambel-geprek.jpg" alt="Crabprek Sambel Geprek" class="product-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="product-media-fallback">
-          <span class="fallback-icon">🦀🌶️</span>
+    <div class="product-grid">
+      <!-- Produk 1: Sambal Geprek -->
+      <article class="product-card tilt-card reveal">
+        <div class="product-media-box">
+          <span class="discount-badge">DISCOUNT</span>
+          <img
+            src="crabprek-sambel-geprek.jpg"
+            alt="Crabprek Sambal Geprek"
+            class="product-img"
+            loading="lazy"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="product-media-fallback">
+            <span class="fallback-icon">🦀🌶️</span>
+          </div>
         </div>
-      </div>
-      <div class="product-details">
-        <span class="product-category">AUTHENTIC CRAFTED RECIPE</span>
-        <h3>Crabprek Sambel Geprek</h3>
-        <p class="product-desc">
-          Kepiting olahan segar pilihan yang digoreng hingga renyah diluar empuk didalam dan digeprek dengan ulekan Sambal Geprek khas Crabprek yang gurih dan pedas mantap.
-        </p>
 
-        <div class="product-includes">
-          <strong>Isian Paket Lengkap:</strong>
-          <ul>
+        <div class="product-body">
+          <span class="product-category">AUTHENTIC CRAFTED RECIPE</span>
+          <h3>Crabprek Sambal Geprek</h3>
+          <p class="product-desc">
+            Kepiting olahan segar pilihan yang digoreng hingga renyah di luar empuk di dalam,
+            lalu digeprek dengan ulekan Sambal Geprek khas Crabprek yang gurih dan pedas mantap.
+          </p>
+
+          <ul class="product-includes-list">
             <li>🦀 Kepiting Renyah Utuh</li>
             <li>🍚 Nasi Putih Hangat</li>
             <li>🔥 Sambal Geprek Khas Crabprek</li>
-            <li>GB Tahu & Tempe Goreng + Lalapan Segar</li>
+            <li>🧈 Tahu & Tempe Goreng + Lalapan</li>
           </ul>
+
+          <div class="product-price-row">
+            <div class="price-stack">
+              <span class="price-old">Rp18.000</span>
+              <strong class="price-new">Rp17.000</strong>
+            </div>
+            <a
+              href="https://wa.me/6282362129646?text=Halo%20Crabprek%2C%20saya%20ingin%20memesan%20Crabprek%20Sambal%20Geprek%20dengan%20harga%20Rp17.000."
+              target="_blank"
+              rel="noopener"
+              class="btn btn-primary btn-product-wa"
+            >
+              Pesan WA 💬
+            </a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Produk 2: Sambal Matah -->
+      <article class="product-card tilt-card reveal">
+        <div class="product-media-box">
+          <span class="discount-badge">DISCOUNT</span>
+          <img
+            src="crabprek-sambal-matah.jpg"
+            alt="Crabprek Sambal Matah"
+            class="product-img"
+            loading="lazy"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+          />
+          <div class="product-media-fallback">
+            <span class="fallback-icon">🦀🌿</span>
+          </div>
         </div>
 
-        <div class="product-price-bar">
-          <div class="price-tag">
-            <small>Harga Porsi Lengkap</small>
-            <strong>Rp 18.000</strong>
+        <div class="product-body">
+          <span class="product-category">FRESH & SPICY SENSATION</span>
+          <h3>Crabprek Sambal Matah</h3>
+          <p class="product-desc">
+            Kepiting renyah dengan sambal matah segar dari irisan bawang merah, cabai, dan serai.
+            Rasa pedasnya berbeda: segar, gurih, dan ringan, cocok untuk pencinta sensasi baru.
+          </p>
+
+          <ul class="product-includes-list">
+            <li>🦀 Kepiting Renyah Utuh</li>
+            <li>🍚 Nasi Putih Hangat</li>
+            <li>🌿 Sambal Matah Segar Khas Crabprek</li>
+            <li>🧈 Tahu & Tempe Goreng + Lalapan</li>
+          </ul>
+
+          <div class="product-price-row">
+            <div class="price-stack">
+              <span class="price-old">Rp18.000</span>
+              <strong class="price-new">Rp17.000</strong>
+            </div>
+            <a
+              href="https://wa.me/6282362129646?text=Halo%20Crabprek%2C%20saya%20ingin%20memesan%20Crabprek%20Sambal%20Matah%20dengan%20harga%20Rp17.000."
+              target="_blank"
+              rel="noopener"
+              class="btn btn-primary btn-product-wa"
+            >
+              Pesan WA 💬
+            </a>
           </div>
-          <a href="#order-form" class="btn btn-primary">Isi Form Pesanan 🛒</a>
         </div>
-      </div>
+      </article>
     </div>
   </section>
 
@@ -143,25 +253,59 @@
       <div class="section-header">
         <span class="section-tag">PEMESANAN ONLINE INSTAN</span>
         <h2>Formulir Pesanan <span class="gradient-text">CRABPREK</span></h2>
-        <p>Pilih jenis pesanan Anda. Alamat pengiriman hanya perlu diisi jika memilih layanan Delivery!</p>
+        <p>Pilih produk dan jenis pesanan. Alamat pengiriman hanya perlu diisi jika memilih layanan Delivery.</p>
       </div>
 
       <form id="wa-order-form" class="order-form">
         <div class="form-grid">
-          
+
           <!-- Nama Pemesan -->
           <div class="form-group full-width">
             <label for="cust-name">Nama Pemesan / Pembeli *</label>
             <input type="text" id="cust-name" placeholder="Masukkan nama Anda..." required />
           </div>
 
+          <!-- Pilihan Produk -->
+          <div class="form-group full-width">
+            <label>Pilih Produk *</label>
+            <div class="product-options-grid">
+              <label class="product-option active" data-product="geprek">
+                <input type="radio" name="product-type" value="Crabprek Sambal Geprek" checked />
+                <img
+                  src="crabprek-sambel-geprek.jpg"
+                  alt=""
+                  loading="lazy"
+                  onerror="this.style.display='none';"
+                />
+                <span>
+                  <strong>Sambal Geprek</strong>
+                  <small>Rp17.000</small>
+                </span>
+              </label>
+
+              <label class="product-option" data-product="matah">
+                <input type="radio" name="product-type" value="Crabprek Sambal Matah" />
+                <img
+                  src="crabprek-sambal-matah.jpg"
+                  alt=""
+                  loading="lazy"
+                  onerror="this.style.display='none';"
+                />
+                <span>
+                  <strong>Sambal Matah</strong>
+                  <small>Rp17.000</small>
+                </span>
+              </label>
+            </div>
+          </div>
+
           <!-- Counter Kuantitas Interaktif -->
           <div class="form-group full-width">
             <label>Jumlah Porsi *</label>
             <div class="qty-counter-wrapper">
-              <button type="button" class="btn-qty-step" id="btn-qty-minus">−</button>
+              <button type="button" class="btn-qty-step" id="btn-qty-minus" aria-label="Kurangi porsi">−</button>
               <input type="number" id="cust-qty" min="1" max="50" value="1" readonly />
-              <button type="button" class="btn-qty-step" id="btn-qty-plus">+</button>
+              <button type="button" class="btn-qty-step" id="btn-qty-plus" aria-label="Tambah porsi">+</button>
             </div>
           </div>
 
@@ -229,7 +373,7 @@
         <div class="order-summary-box">
           <div class="summary-text">
             <span>Total Pembayaran Est:</span>
-            <strong id="live-total-price">Rp 18.000</strong>
+            <strong id="live-total-price">Rp 17.000</strong>
           </div>
           <button type="submit" class="btn btn-primary btn-large btn-submit-wa">
             Kirim Pesanan 💬
@@ -244,27 +388,49 @@
     <div class="info-card-box reveal">
       <span class="section-tag">LOKASI PENJUALAN & OPERASIONAL</span>
       <h2>Kunjungi Stand Kami di <span class="gradient-text">Taman Batang Agam</span></h2>
-      
+
       <div class="info-grid">
         <!-- Direct Link ke Maps -->
-        <a href="https://maps.app.goo.gl/11KsLJGESKKFnYJp6" target="_blank" rel="noopener" class="info-tile tile-clickable" title="Klik untuk Buka Google Maps">
+        <a
+          href="https://maps.app.goo.gl/11KsLJGESKKFnYJp6"
+          target="_blank"
+          rel="noopener"
+          class="info-tile tile-clickable"
+          title="Klik untuk Buka Google Maps"
+        >
           <div class="tile-icon">📍</div>
           <h3>Lokasi Stand Utama ↗</h3>
-          <p><strong>Taman Batang Agam</strong><br />Kawasan Kuliner Taman Batang Agam, Kota Payakumbuh<br /><small class="click-hint">Klik untuk petunjuk arah Maps 🗺️</small></p>
+          <p>
+            <strong>Taman Batang Agam</strong><br />
+            Kawasan Kuliner Taman Batang Agam, Kota Payakumbuh<br />
+            <small class="click-hint">Klik untuk petunjuk arah Maps 🗺️</small>
+          </p>
         </a>
 
         <!-- Interactive Jam Operasional Trigger -->
         <div class="info-tile tile-clickable" id="trigger-clock-modal" title="Klik untuk Lihat Jam Analog">
           <div class="tile-icon">⏰</div>
           <h3>Jam Operasional ⌚</h3>
-          <p><strong>Buka Setiap Hari Operasional</strong><br />Pukul 07.00 – 18.00 WIB<br /><small class="click-hint">Klik untuk lihat jam analog live 🕒</small></p>
+          <p>
+            <strong>Buka Setiap Hari Operasional</strong><br />
+            Pukul 07.00 – 18.00 WIB<br />
+            <small class="click-hint">Klik untuk lihat jam analog live 🕒</small>
+          </p>
         </div>
 
         <!-- Direct WhatsApp Link -->
-        <a href="https://wa.me/6282362129646" target="_blank" rel="noopener" class="info-tile tile-clickable">
+        <a
+          href="https://wa.me/6282362129646"
+          target="_blank"
+          rel="noopener"
+          class="info-tile tile-clickable"
+        >
           <div class="tile-icon">📱</div>
           <h3>Pemesanan & Pre-Order ↗</h3>
-          <p>WhatsApp: <strong>+62 823-6212-9646</strong><br /><em>(Siap Melayani Pesan Antar / Delivery)</em></p>
+          <p>
+            WhatsApp: <strong>+62 823-6212-9646</strong><br />
+            <em>(Siap Melayani Pesan Antar / Delivery)</em>
+          </p>
         </a>
 
         <div class="info-tile">
@@ -281,31 +447,59 @@
         <strong>CRABPREK.ID</strong>
         <span>© 2026 CRABPREK Indonesia. All Rights Reserved.</span>
       </div>
-      
+
       <!-- Social Media Links Direct -->
       <div class="footer-socials">
-        <a href="https://wa.me/6282362129646" target="_blank" rel="noopener" class="social-icon wa" title="WhatsApp Chat">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        <a
+          href="https://wa.me/6282362129646"
+          target="_blank"
+          rel="noopener"
+          class="social-icon wa"
+          title="WhatsApp Chat"
+          aria-label="WhatsApp"
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+          </svg>
         </a>
-        <a href="https://www.instagram.com/crabprek/" target="_blank" rel="noopener" class="social-icon ig" title="Instagram Profile">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        <a
+          href="https://www.instagram.com/crabprek/"
+          target="_blank"
+          rel="noopener"
+          class="social-icon ig"
+          title="Instagram Profile"
+          aria-label="Instagram"
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
         </a>
-        <a href="https://www.tiktok.com/@crabprek" target="_blank" rel="noopener" class="social-icon tiktok" title="TikTok Profile">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.98-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.56-1.31 1.56-1.24 2.56.03.8.44 1.58 1.09 2.05.77.58 1.8.77 2.72.53 1.01-.24 1.84-.97 2.16-1.93.15-.49.21-.99.21-1.5V.02z"/></svg>
+        <a
+          href="https://www.tiktok.com/@crabprek"
+          target="_blank"
+          rel="noopener"
+          class="social-icon tiktok"
+          title="TikTok Profile"
+          aria-label="TikTok"
+        >
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+            <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.98-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.56-1.31 1.56-1.24 2.56.03.8.44 1.58 1.09 2.05.77.58 1.8.77 2.72.53 1.01-.24 1.84-.97 2.16-1.93.15-.49.21-.99.21-1.5V.02z"/>
+          </svg>
         </a>
       </div>
     </footer>
   </section>
 
   <!-- Modal Jam Analog Interaktif -->
-  <div id="clock-modal" class="modal-backdrop">
+  <div id="clock-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-label="Jam operasional Crabprek">
     <div class="modal-clock-content">
-      <button class="btn-close-modal" id="btn-close-clock">✕</button>
+      <button class="btn-close-modal" id="btn-close-clock" aria-label="Tutup jam">✕</button>
       <span class="section-tag">JAM OPERASIONAL LIVE</span>
       <h3 style="margin-top: 6px; font-weight: 800;">Taman Batang Agam</h3>
-      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Buka Setiap Hari: 07.00 – 18.00 WIB</p>
-      
-      <!-- Canvas Jam Analog -->
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+        Buka Setiap Hari: 07.00 – 18.00 WIB
+      </p>
+
       <div class="clock-canvas-wrap">
         <canvas id="analog-clock-canvas" width="240" height="240"></canvas>
       </div>

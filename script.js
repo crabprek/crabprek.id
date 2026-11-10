@@ -1,6 +1,5 @@
 /* ==========================================================================
    CRABPREK JAVASCRIPT ENGINE
-   (FIXED: touch gesture, no NaN, smooth animation, real URLs)
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,16 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const particles = [];
+    const trailColors = ['#FF4038', '#FF8A24', '#D7F34A'];
 
     const addParticle = (x, y) => {
       if (!Number.isFinite(x) || !Number.isFinite(y)) return;
-      if (particles.length > 40) particles.shift();
+      if (particles.length > 42) particles.shift();
+
       particles.push({
-        x: x,
-        y: y,
-        size: Math.random() * 6 + 3,
+        x,
+        y,
+        size: Math.random() * 5.5 + 2.5,
         alpha: 1,
-        color: Math.random() > 0.5 ? '#ff3b30' : '#ffb703',
+        color: trailColors[Math.floor(Math.random() * trailColors.length)],
         vx: (Math.random() - 0.5) * 1.5,
         vy: (Math.random() - 0.5) * 1.5 - 1
       });
@@ -37,20 +38,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('mousemove', (e) => addParticle(e.clientX, e.clientY));
 
-    // ✅ FIX: e.touches[0] (sebelumnya e.touches → undefined → tidak muncul)
     window.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) {
-        addParticle(e.touches[0].clientX, e.touches[0].clientY);
-      }
+      if (e.touches.length > 0) addParticle(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
+
     window.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 0) {
-        addParticle(e.touches[0].clientX, e.touches[0].clientY);
-      }
+      if (e.touches.length > 0) addParticle(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
 
     const animateTrail = () => {
       tCtx.clearRect(0, 0, tWidth, tHeight);
+
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
         p.x += p.vx;
@@ -69,20 +67,24 @@ document.addEventListener('DOMContentLoaded', () => {
           tCtx.restore();
         }
       }
+
       requestAnimationFrame(animateTrail);
     };
+
     animateTrail();
   }
 
   // --------------------------------------------------------------------------
-  // 2. HERO CANVAS 3D ENGINE (BOLA & KEPITING INTERAKTIF)
+  // 2. HERO CANVAS 3D ENGINE
   // --------------------------------------------------------------------------
   const canvas = document.getElementById('hero-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
     let width, height;
-    let mouseX = 0, mouseY = 0;
-    let targetMouseX = 0, targetMouseY = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetMouseX = 0;
+    let targetMouseY = 0;
 
     let canvasPointerX = -9999;
     let canvasPointerY = -9999;
@@ -92,10 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
       width = canvas.width = rect.width;
       height = canvas.height = rect.height;
     };
+
     window.addEventListener('resize', resize);
     resize();
 
-    // ✅ FIX: guard anti-NaN
     const updatePointerPos = (clientX, clientY) => {
       if (!Number.isFinite(clientX) || !Number.isFinite(clientY)) return;
 
@@ -108,21 +110,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('mousemove', (e) => updatePointerPos(e.clientX, e.clientY));
 
-    // ✅ FIX: e.touches[0] — ini yang bikin bola lari ke sudut atas
     canvas.addEventListener('touchstart', (e) => {
       if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
+
     canvas.addEventListener('touchmove', (e) => {
       if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY);
     }, { passive: true });
 
-    // ✅ NEW: reset saat jari diangkat → bola balik ke tengah, crab berhenti kabur
     const resetPointer = () => {
       targetMouseX = 0;
       targetMouseY = 0;
       canvasPointerX = -9999;
       canvasPointerY = -9999;
     };
+
     canvas.addEventListener('touchend', resetPointer, { passive: true });
     canvas.addEventListener('touchcancel', resetPointer, { passive: true });
     canvas.addEventListener('mouseleave', resetPointer);
@@ -137,27 +139,27 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.translate(x, y);
       ctx.scale(scale, scale);
 
-      ctx.fillStyle = isFleeing ? '#ff1100' : '#ff3b30';
-      ctx.shadowBlur = isFleeing ? 20 : 12;
-      ctx.shadowColor = isFleeing ? '#ffb703' : '#ff6b35';
+      ctx.fillStyle = isFleeing ? '#FF4038' : '#FF4038';
+      ctx.shadowBlur = isFleeing ? 22 : 12;
+      ctx.shadowColor = isFleeing ? '#D7F34A' : '#FF8A24';
 
       ctx.beginPath();
       ctx.ellipse(0, 0, 16, 11, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = '#F5EBDD';
       ctx.beginPath();
       ctx.arc(-6, -13, 3, 0, Math.PI * 2);
       ctx.arc(6, -13, 3, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.fillStyle = '#000';
+      ctx.fillStyle = '#08090B';
       ctx.beginPath();
       ctx.arc(-6, -14, 1.5, 0, Math.PI * 2);
       ctx.arc(6, -14, 1.5, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.strokeStyle = '#ff3b30';
+      ctx.strokeStyle = '#FF4038';
       ctx.lineWidth = 3.5;
 
       ctx.beginPath();
@@ -171,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.stroke();
 
       ctx.lineWidth = 2;
+
       for (let side = -1; side <= 1; side += 2) {
         for (let i = 0; i < 3; i++) {
           const legPhase = Math.sin(legCycle + i * 0.8) * (isFleeing ? 7 : 4);
@@ -186,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (isFleeing) {
-        ctx.fillStyle = '#ffb703';
+        ctx.fillStyle = '#D7F34A';
         ctx.font = 'bold 10px sans-serif';
         ctx.fillText('💨 KABUR!', -20, -28);
       }
@@ -195,7 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const drawVisualStage = () => {
-      // ✅ Defensive: jika NaN muncul karena apa pun, reset ke 0
       if (!Number.isFinite(mouseX)) mouseX = 0;
       if (!Number.isFinite(mouseY)) mouseY = 0;
       if (!Number.isFinite(targetMouseX)) targetMouseX = 0;
@@ -203,7 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       ctx.clearRect(0, 0, width, height);
 
-      // Animasi santai & stabil
       mouseX += (targetMouseX - mouseX) * 0.02;
       mouseY += (targetMouseY - mouseY) * 0.02;
 
@@ -255,7 +256,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const crabScale = 0.85 + Math.sin(crabWalkAngle) * 0.15;
       const legCycleSpeed = isTouchNear ? crabWalkAngle * 18 : crabWalkAngle * 6;
 
-      drawProceduralCrab(crabX, crabY, crabScale, legCycleSpeed, isTouchNear || crabFleeSpeed > 0.02);
+      drawProceduralCrab(
+        crabX,
+        crabY,
+        crabScale,
+        legCycleSpeed,
+        isTouchNear || crabFleeSpeed > 0.02
+      );
 
       ctx.restore();
       requestAnimationFrame(drawVisualStage);
@@ -265,7 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // 3. FORM PEMESANAN INTERAKTIF & HARGA EKSTRA REVISI
+  // 3. FORM PEMESANAN
   // --------------------------------------------------------------------------
   const qtyInput = document.getElementById('cust-qty');
   const btnMinus = document.getElementById('btn-qty-minus');
@@ -273,19 +280,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const livePriceEl = document.getElementById('live-total-price');
   const waForm = document.getElementById('wa-order-form');
   const serviceCards = document.querySelectorAll('.service-card');
+  const productOptions = document.querySelectorAll('.product-option');
   const extraCheckboxes = document.querySelectorAll('.extra-item');
   const addressGroup = document.getElementById('address-field-group');
   const addressInput = document.getElementById('cust-address');
 
-  const BASE_PRICE = 18000;
+  const BASE_PRICE = 17000;
+
+  const getSelectedProduct = () => {
+    const selected = document.querySelector('input[name="product-type"]:checked');
+    return selected ? selected.value : 'Crabprek Sambal Geprek';
+  };
 
   const calculateTotal = () => {
-    let qty = parseInt(qtyInput.value) || 1;
+    if (!qtyInput) return;
+
+    let qty = parseInt(qtyInput.value, 10) || 1;
     let total = qty * BASE_PRICE;
 
     extraCheckboxes.forEach(cb => {
       if (cb.checked) {
-        total += (parseInt(cb.getAttribute('data-price')) || 0) * qty;
+        total += (parseInt(cb.getAttribute('data-price'), 10) || 0) * qty;
       }
     });
 
@@ -296,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (btnMinus && btnPlus && qtyInput) {
     btnMinus.addEventListener('click', () => {
-      let val = parseInt(qtyInput.value) || 1;
+      let val = parseInt(qtyInput.value, 10) || 1;
       if (val > 1) {
         qtyInput.value = val - 1;
         calculateTotal();
@@ -304,7 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnPlus.addEventListener('click', () => {
-      let val = parseInt(qtyInput.value) || 1;
+      let val = parseInt(qtyInput.value, 10) || 1;
       qtyInput.value = val + 1;
       calculateTotal();
     });
@@ -312,225 +327,85 @@ document.addEventListener('DOMContentLoaded', () => {
 
   extraCheckboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
 
+  productOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      productOptions.forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+
+      const radio = option.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+
+      calculateTotal();
+    });
+  });
+
   serviceCards.forEach(card => {
     card.addEventListener('click', () => {
       serviceCards.forEach(c => c.classList.remove('active'));
       card.classList.add('active');
+
       const radio = card.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
 
       const serviceType = card.getAttribute('data-service');
-      if (serviceType === 'delivery') {
-        addressGroup.style.display = 'flex';
-        addressInput.required = true;
-      } else {
-        addressGroup.style.display = 'none';
-        addressInput.required = false;
-        addressInput.value = '';
+
+      if (addressGroup && addressInput) {
+        if (serviceType === 'delivery') {
+          addressGroup.style.display = 'flex';
+          addressInput.required = true;
+        } else {
+          addressGroup.style.display = 'none';
+          addressInput.required = false;
+          addressInput.value = '';
+        }
       }
     });
   });
+
+  calculateTotal();
 
   if (waForm) {
     waForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
       const name = document.getElementById('cust-name').value.trim();
-      const qty = parseInt(qtyInput.value) || 1;
+      const qty = parseInt(qtyInput.value, 10) || 1;
+      const selectedProduct = getSelectedProduct();
 
-      let selectedService = "Makan di Tempat";
+      let selectedService = 'Makan di Tempat';
       const activeRadio = document.querySelector('input[name="service-type"]:checked');
       if (activeRadio) selectedService = activeRadio.value;
 
-      const address = addressInput.value.trim();
+      const address = addressInput ? addressInput.value.trim() : '';
       const note = document.getElementById('cust-note').value.trim();
 
-      let selectedExtras = [];
+      const selectedExtras = [];
       extraCheckboxes.forEach(cb => {
         if (cb.checked) selectedExtras.push(cb.value);
       });
 
-      let currentTotalText = livePriceEl ? livePriceEl.textContent : `Rp ${(qty * BASE_PRICE).toLocaleString('id-ID')}`;
+      const currentTotalText = livePriceEl
+        ? livePriceEl.textContent.trim()
+        : `Rp ${(qty * BASE_PRICE).toLocaleString('id-ID')}`;
 
       let waMessage = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
+
       waMessage += `📋 *DETAIL PESANAN:*\n`;
-      waMessage += `• Menu Utama: *Crabprek Sambel Geprek*\n`;
+      waMessage += `• Produk: *${selectedProduct}*\n`;
+      waMessage += `• Harga Satuan: *Rp 17.000*\n`;
       waMessage += `• Jumlah: *${qty} Porsi*\n`;
       waMessage += `• Layanan: *${selectedService}*\n`;
+
       if (selectedExtras.length > 0) {
         waMessage += `• Ekstra: ${selectedExtras.join(', ')}\n`;
       }
+
       waMessage += `• Total Est: *${currentTotalText}*\n\n`;
 
       waMessage += `👤 *DATA PEMESAN:*\n`;
       waMessage += `• Nama: ${name}\n`;
+
       if (address) waMessage += `• Alamat/Lokasi Antar: ${address}\n`;
       if (note) waMessage += `• Catatan: ${note}\n`;
 
-      waMessage += `\nMohon diproses ya kak. Terima kasih! 🦀🔥`;
-
-      const waUrl = `https://wa.me/6282362129646?text=${encodeURIComponent(waMessage)}`;
-      window.location.href = waUrl;
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // 4. MODAL JAM ANALOG INTERAKTIF
-  // --------------------------------------------------------------------------
-  const clockTrigger = document.getElementById('trigger-clock-modal');
-  const clockModal = document.getElementById('clock-modal');
-  const btnCloseClock = document.getElementById('btn-close-clock');
-  const clockCanvas = document.getElementById('analog-clock-canvas');
-  const digitalClockText = document.getElementById('digital-clock-text');
-
-  let clockInterval = null;
-
-  const drawAnalogClock = () => {
-    if (!clockCanvas) return;
-    const cCtx = clockCanvas.getContext('2d');
-    const radius = clockCanvas.width / 2;
-
-    cCtx.clearRect(0, 0, clockCanvas.width, clockCanvas.height);
-
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
-
-    if (digitalClockText) {
-      const hStr = String(hours).padStart(2, '0');
-      const mStr = String(minutes).padStart(2, '0');
-      const sStr = String(seconds).padStart(2, '0');
-      digitalClockText.textContent = `${hStr}:${mStr}:${sStr} WIB`;
-    }
-
-    cCtx.save();
-    cCtx.translate(radius, radius);
-
-    cCtx.beginPath();
-    cCtx.arc(0, 0, radius - 8, 0, Math.PI * 2);
-    cCtx.fillStyle = '#12141d';
-    cCtx.fill();
-    cCtx.lineWidth = 4;
-    cCtx.strokeStyle = '#ff3b30';
-    cCtx.stroke();
-
-    cCtx.font = '28px sans-serif';
-    cCtx.textAlign = 'center';
-    cCtx.textBaseline = 'middle';
-    cCtx.fillText('🦀', 0, 0);
-
-    for (let i = 0; i < 12; i++) {
-      const ang = (i * Math.PI) / 6;
-      cCtx.beginPath();
-      cCtx.rotate(ang);
-      cCtx.moveTo(0, -(radius - 20));
-      cCtx.lineTo(0, -(radius - 12));
-      cCtx.strokeStyle = '#ffb703';
-      cCtx.lineWidth = 3;
-      cCtx.stroke();
-      cCtx.rotate(-ang);
-    }
-
-    const hourAng = ((hours % 12) * Math.PI) / 6 + (minutes * Math.PI) / 360;
-    cCtx.beginPath();
-    cCtx.rotate(hourAng);
-    cCtx.moveTo(0, 0);
-    cCtx.lineTo(0, -(radius * 0.5));
-    cCtx.strokeStyle = '#f8fafc';
-    cCtx.lineWidth = 5;
-    cCtx.stroke();
-    cCtx.rotate(-hourAng);
-
-    const minAng = (minutes * Math.PI) / 30 + (seconds * Math.PI) / 1800;
-    cCtx.beginPath();
-    cCtx.rotate(minAng);
-    cCtx.moveTo(0, 0);
-    cCtx.lineTo(0, -(radius * 0.7));
-    cCtx.strokeStyle = '#ffb703';
-    cCtx.lineWidth = 3;
-    cCtx.stroke();
-    cCtx.rotate(-minAng);
-
-    const secAng = (seconds * Math.PI) / 30;
-    cCtx.beginPath();
-    cCtx.rotate(secAng);
-    cCtx.moveTo(0, 10);
-    cCtx.lineTo(0, -(radius * 0.82));
-    cCtx.strokeStyle = '#ff3b30';
-    cCtx.lineWidth = 2;
-    cCtx.stroke();
-    cCtx.rotate(-secAng);
-
-    cCtx.restore();
-  };
-
-  if (clockTrigger && clockModal) {
-    clockTrigger.addEventListener('click', () => {
-      clockModal.classList.add('active');
-      drawAnalogClock();
-      clockInterval = setInterval(drawAnalogClock, 1000);
-    });
-
-    btnCloseClock.addEventListener('click', () => {
-      clockModal.classList.remove('active');
-      if (clockInterval) clearInterval(clockInterval);
-    });
-
-    clockModal.addEventListener('click', (e) => {
-      if (e.target === clockModal) {
-        clockModal.classList.remove('active');
-        if (clockInterval) clearInterval(clockInterval);
-      }
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // 5. PARALLAX 3D TILT ON HOVER
-  // --------------------------------------------------------------------------
-  const tiltCard = document.querySelector('.tilt-card');
-  if (tiltCard) {
-    tiltCard.addEventListener('mousemove', (e) => {
-      const rect = tiltCard.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-
-      const tiltX = (y / rect.height) * -12;
-      const tiltY = (x / rect.width) * 12;
-
-      tiltCard.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-    });
-
-    tiltCard.addEventListener('mouseleave', () => {
-      tiltCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // 6. NAVBAR SCROLL SHIFT & SCROLL REVEAL OBSERVER
-  // --------------------------------------------------------------------------
-  const navbar = document.getElementById('navbar');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 40) {
-      navbar.style.background = 'rgba(8, 9, 13, 0.96)';
-      navbar.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.6)';
-      navbar.style.height = '70px';
-    } else {
-      navbar.style.background = 'rgba(8, 9, 13, 0.85)';
-      navbar.style.boxShadow = 'none';
-      navbar.style.height = '80px';
-    }
-  });
-
-  const reveals = document.querySelectorAll('.reveal');
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('active');
-      }
-    });
-  }, { threshold: 0.12 });
-
-  reveals.forEach(el => revealObserver.observe(el));
-
-});
+      waMessage += `\nMohon diproses ya kak. Ter

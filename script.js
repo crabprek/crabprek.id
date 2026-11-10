@@ -158,56 +158,50 @@ document.addEventListener('DOMContentLoaded', () => {
     drawVisualStage();
   }
 
-  // 3. FORM PEMESANAN
+// --------------------------------------------------------------------------
+  // 3. SISTEM KERANJANG & CHECKOUT (CART SYSTEM)
+  // --------------------------------------------------------------------------
+  let orderCart = [];
+  const BASE_PRICE = 17000;
+
+  // Form Elements
   const qtyInput = document.getElementById('cust-qty');
   const btnMinus = document.getElementById('btn-qty-minus');
   const btnPlus = document.getElementById('btn-qty-plus');
-  const livePriceEl = document.getElementById('live-total-price');
-  const waForm = document.getElementById('wa-order-form');
-  const serviceCards = document.querySelectorAll('.service-card');
   const productOptions = document.querySelectorAll('.product-option');
+  const serviceCards = document.querySelectorAll('.service-card');
   const extraCheckboxes = document.querySelectorAll('.extra-item');
   const addressGroup = document.getElementById('address-field-group');
   const addressInput = document.getElementById('cust-address');
+  
+  // Cart Elements
+  const btnAddToCart = document.getElementById('btn-add-to-cart');
+  const cartContainer = document.getElementById('cart-items-container');
+  const liveTotalPrice = document.getElementById('live-total-price');
+  const btnSubmitWA = document.getElementById('btn-submit-wa');
 
-  const BASE_PRICE = 17000;
-
-  const getSelectedProduct = () => {
-    const selected = document.querySelector('input[name="product-type"]:checked');
-    return selected ? selected.value : 'Crabprek Sambal Geprek';
-  };
-
-  const calculateTotal = () => {
-    if (!qtyInput) return;
-    let qty = parseInt(qtyInput.value, 10) || 1;
-    let total = qty * BASE_PRICE;
-
-    extraCheckboxes.forEach(cb => { if (cb.checked) total += (parseInt(cb.getAttribute('data-price'), 10) || 0) * qty; });
-    if (livePriceEl) livePriceEl.textContent = `Rp ${total.toLocaleString('id-ID')}`;
-  };
-
+  // Logic: Plus Minus Qty Menu
   if (btnMinus && btnPlus && qtyInput) {
     btnMinus.addEventListener('click', () => {
       let val = parseInt(qtyInput.value, 10) || 1;
-      if (val > 1) { qtyInput.value = val - 1; calculateTotal(); }
+      if (val > 1) qtyInput.value = val - 1;
     });
     btnPlus.addEventListener('click', () => {
-      qtyInput.value = (parseInt(qtyInput.value, 10) || 1) + 1; calculateTotal();
+      qtyInput.value = (parseInt(qtyInput.value, 10) || 1) + 1;
     });
   }
 
-  extraCheckboxes.forEach(cb => cb.addEventListener('change', calculateTotal));
-
+  // Logic: UI Pilihan Menu Aktif
   productOptions.forEach(option => {
     option.addEventListener('click', () => {
       productOptions.forEach(o => o.classList.remove('active'));
       option.classList.add('active');
       const radio = option.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
-      calculateTotal();
     });
   });
 
+  // Logic: UI Pilihan Layanan Aktif (Tampil Alamat jika Delivery)
   serviceCards.forEach(card => {
     card.addEventListener('click', () => {
       serviceCards.forEach(c => c.classList.remove('active'));
@@ -216,39 +210,160 @@ document.addEventListener('DOMContentLoaded', () => {
       if (radio) radio.checked = true;
       if (addressGroup && addressInput) {
         if (card.getAttribute('data-service') === 'delivery') {
-          addressGroup.style.display = 'flex'; addressInput.required = true;
+          addressGroup.style.display = 'flex'; 
         } else {
-          addressGroup.style.display = 'none'; addressInput.required = false; addressInput.value = '';
+          addressGroup.style.display = 'none'; 
+          addressInput.value = '';
         }
       }
     });
   });
 
-  calculateTotal();
+  // Fungsi Render Keranjang HTML
+  const renderCart = () => {
+    if (orderCart.length === 0) {
+      cartContainer.innerHTML = '<div class="empty-cart-msg">Keranjang masih kosong. Yuk tambah menu di atas!</div>';
+      liveTotalPrice.textContent = "Rp 0";
+      return;
+    }
 
-  if (waForm) {
-    waForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('cust-name').value.trim();
+    let html = '';
+    let grandTotal = 0;
+
+    orderCart.forEach((item) => {
+      grandTotal += item.total;
+      
+      let extrasText = item.extras.length > 0 ? `<small>➕ ${item.extras.join(', ')}</small>` : '';
+      let noteText = item.note ? `<small>📝 Catatan: ${item.note}</small>` : '';
+
+      html += `
+        <div class="cart-item">
+          <div class="cart-item-details">
+            <strong>${item.qty}x ${item.product}</strong>
+            ${extrasText}
+            ${noteText}
+            <span class="cart-item-price">Rp ${item.total.toLocaleString('id-ID')}</span>
+          </div>
+          <button type="button" class="btn-remove-item" data-id="${item.id}" aria-label="Hapus item">✕</button>
+        </div>
+      `;
+    });
+
+    cartContainer.innerHTML = html;
+    liveTotalPrice.textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+
+    // Event Hapus Item
+    document.querySelectorAll('.btn-remove-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idToRemove = parseInt(e.target.dataset.id);
+        orderCart = orderCart.filter(item => item.id !== idToRemove);
+        renderCart();
+      });
+    });
+  };
+
+  // Logic: Tambah ke Keranjang
+  if (btnAddToCart) {
+    btnAddToCart.addEventListener('click', () => {
+      const activeProduct = document.querySelector('input[name="product-type"]:checked');
+      if(!activeProduct) return;
+
       const qty = parseInt(qtyInput.value, 10) || 1;
-      const selectedProduct = getSelectedProduct();
+      const extras = [];
+      let extraTotal = 0;
+
+      extraCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          extras.push(cb.value);
+          extraTotal += parseInt(cb.dataset.price, 10);
+        }
+      });
+
+      const note = document.getElementById('item-note').value.trim();
+      const itemTotal = (BASE_PRICE + extraTotal) * qty;
+
+      const cartItem = {
+        id: Date.now(),
+        product: activeProduct.value,
+        qty: qty,
+        extras: extras,
+        note: note,
+        total: itemTotal
+      };
+
+      orderCart.push(cartItem);
+      renderCart();
+
+      // Feedback Visual Tombol
+      const originalText = btnAddToCart.innerHTML;
+      btnAddToCart.innerHTML = "Berhasil Ditambahkan! ✓";
+      btnAddToCart.style.background = "var(--lime)";
+      btnAddToCart.style.color = "#000";
+      
+      setTimeout(() => {
+        btnAddToCart.innerHTML = originalText;
+        btnAddToCart.style.background = "";
+        btnAddToCart.style.color = "";
+      }, 1500);
+
+      // Reset Input Form Menu
+      qtyInput.value = 1;
+      extraCheckboxes.forEach(cb => cb.checked = false);
+      document.getElementById('item-note').value = '';
+    });
+  }
+
+  // Logic: Eksekusi Kirim WA
+  if (btnSubmitWA) {
+    btnSubmitWA.addEventListener('click', () => {
+      if (orderCart.length === 0) {
+        alert("Keranjang pesanan masih kosong! Silakan 'Tambah ke Keranjang' terlebih dahulu.");
+        return;
+      }
+
+      const name = document.getElementById('cust-name').value.trim();
+      if (!name) {
+        alert("Mohon isi Nama Pemesan terlebih dahulu.");
+        document.getElementById('cust-name').focus();
+        return;
+      }
+
       const activeRadio = document.querySelector('input[name="service-type"]:checked');
       const selectedService = activeRadio ? activeRadio.value : 'Makan di Tempat';
       const address = addressInput ? addressInput.value.trim() : '';
-      const note = document.getElementById('cust-note').value.trim();
-      const selectedExtras = Array.from(extraCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
-      const currentTotalText = livePriceEl ? livePriceEl.textContent.trim() : `Rp ${(qty * BASE_PRICE).toLocaleString('id-ID')}`;
+      
+      if (selectedService.includes('Delivery') && !address) {
+        alert("Untuk pesanan Delivery, mohon isi Alamat Lengkap pengiriman.");
+        document.getElementById('cust-address').focus();
+        return;
+      }
 
       let waMessage = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
-      waMessage += `📋 *DETAIL PESANAN:*\n• Produk: *${selectedProduct}*\n• Harga Satuan: *Rp 17.000*\n• Jumlah: *${qty} Porsi*\n• Layanan: *${selectedService}*\n`;
-      if (selectedExtras.length > 0) waMessage += `• Ekstra: ${selectedExtras.join(', ')}\n`;
-      waMessage += `• Total Est: *${currentTotalText}*\n\n`;
-      waMessage += `👤 *DATA PEMESAN:*\n• Nama: ${name}\n`;
-      if (address) waMessage += `• Alamat/Lokasi Antar: ${address}\n`;
-      if (note) waMessage += `• Catatan: ${note}\n`;
+      waMessage += `🛒 *DAFTAR PESANAN:*\n`;
+
+      let finalTotal = 0;
+      orderCart.forEach((item, index) => {
+        finalTotal += item.total;
+        waMessage += `\n*${index + 1}. ${item.qty}x ${item.product}*\n`;
+        if (item.extras.length > 0) waMessage += `   ├ Ekstra: ${item.extras.join(', ')}\n`;
+        if (item.note) waMessage += `   ├ Catatan: ${item.note}\n`;
+        waMessage += `   └ Subtotal: Rp ${item.total.toLocaleString('id-ID')}\n`;
+      });
+
+      waMessage += `\n=========================\n`;
+      waMessage += `*TOTAL TAGIHAN: Rp ${finalTotal.toLocaleString('id-ID')}*\n`;
+      waMessage += `=========================\n\n`;
+
+      waMessage += `👤 *DATA PEMESAN:*\n`;
+      waMessage += `• Nama: ${name}\n`;
+      waMessage += `• Layanan: ${selectedService}\n`;
+      if (address) waMessage += `• Alamat Antar: ${address}\n`;
+
       waMessage += `\nMohon diproses ya kak. Terima kasih!`;
 
-      window.open(`https://wa.me/6282362129646?text=${encodeURIComponent(waMessage)}`, '_blank');
+      const waNumber = "6282362129646";
+      const encodedMessage = encodeURIComponent(waMessage);
+      window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank');
     });
   }
 

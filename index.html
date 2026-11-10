@@ -189,126 +189,149 @@
     </div>
   </section>
 
-  <!-- Interactive Order Form Section -->
+<!-- Interactive Order Form Section -->
   <section id="order-form" class="section">
     <div class="order-card-wrapper reveal">
       <div class="section-header">
         <span class="section-tag">PEMESANAN ONLINE INSTAN</span>
         <h2>Formulir Pesanan <span class="gradient-text">CRABPREK</span></h2>
-        <p>Pilih varian sambal dan jenis pesananmu. Cepat, praktis, langsung terhubung ke WhatsApp.</p>
+        <p>Bisa pesan beda-beda varian & ekstra dalam satu pesanan. Masukkan ke keranjang, lalu Checkout!</p>
       </div>
 
-      <form id="wa-order-form" class="order-form">
-        <div class="form-grid">
+      <form id="wa-order-form" class="order-form" onsubmit="return false;">
+        
+        <!-- STEP 1: PILIH MENU & EKSTRA -->
+        <div class="form-section-box">
+          <h3 class="step-title"><span>1</span> Pilih Menu & Ekstra</h3>
+          
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <span class="modern-label">Pilih Produk Utama</span>
+              <div class="product-options-grid">
+                <label class="product-option active" data-product="geprek">
+                  <input type="radio" name="product-type" value="Crabprek Sambal Geprek" checked />
+                  <img src="crabprek-sambel-geprek.jpg" alt="Sambal Geprek" loading="lazy" />
+                  <div class="option-info">
+                    <strong>Sambal Geprek</strong>
+                    <small>Rp17.000 (Paket)</small>
+                  </div>
+                  <div class="check-indicator">✓</div>
+                </label>
 
-          <div class="form-group full-width form-floating">
-            <input type="text" id="cust-name" placeholder=" " required />
-            <label for="cust-name">Nama Pemesan / Pembeli</label>
-          </div>
-
-          <div class="form-group full-width">
-            <span class="modern-label">Pilih Produk Utama</span>
-            <div class="product-options-grid">
-              <label class="product-option active" data-product="geprek">
-                <input type="radio" name="product-type" value="Crabprek Sambal Geprek" checked />
-                <img src="crabprek-sambel-geprek.jpg" alt="Sambal Geprek" loading="lazy" />
-                <div class="option-info">
-                  <strong>Sambal Geprek</strong>
-                  <small>Rp17.000 (Paket Lengkap)</small>
-                </div>
-                <div class="check-indicator">✓</div>
-              </label>
-
-              <label class="product-option" data-product="matah">
-                <input type="radio" name="product-type" value="Crabprek Sambal Matah" />
-                <img src="crabprek-sambal-matah.jpg" alt="Sambal Matah" loading="lazy" />
-                <div class="option-info">
-                  <strong>Sambal Matah</strong>
-                  <small>Rp17.000 (Paket Lengkap)</small>
-                </div>
-                <div class="check-indicator">✓</div>
-              </label>
+                <label class="product-option" data-product="matah">
+                  <input type="radio" name="product-type" value="Crabprek Sambal Matah" />
+                  <img src="crabprek-sambal-matah.jpg" alt="Sambal Matah" loading="lazy" />
+                  <div class="option-info">
+                    <strong>Sambal Matah</strong>
+                    <small>Rp17.000 (Paket)</small>
+                  </div>
+                  <div class="check-indicator">✓</div>
+                </label>
+              </div>
             </div>
-          </div>
 
-          <div class="form-group full-width align-center">
-            <span class="modern-label">Jumlah Porsi</span>
-            <div class="qty-counter-wrapper modern-qty">
-              <button type="button" class="btn-qty-step" id="btn-qty-minus" aria-label="Kurangi porsi">−</button>
-              <input type="number" id="cust-qty" min="1" max="50" value="1" readonly />
-              <button type="button" class="btn-qty-step" id="btn-qty-plus" aria-label="Tambah porsi">+</button>
+            <div class="form-group full-width align-center">
+              <span class="modern-label">Jumlah Porsi (Untuk menu di atas)</span>
+              <div class="qty-counter-wrapper modern-qty">
+                <button type="button" class="btn-qty-step" id="btn-qty-minus">−</button>
+                <input type="number" id="cust-qty" min="1" max="50" value="1" readonly />
+                <button type="button" class="btn-qty-step" id="btn-qty-plus">+</button>
+              </div>
             </div>
-          </div>
 
-          <div class="form-group full-width">
-            <span class="modern-label">Pilih Jenis Layanan</span>
-            <div class="service-cards-grid">
-              <label class="service-card active" data-service="dinein">
-                <input type="radio" name="service-type" value="Makan di Tempat (Stand Batang Agam)" checked />
-                <span class="s-icon">🍽️</span>
-                <strong>Makan di Tempat</strong>
-                <small>Stand Batang Agam</small>
-              </label>
-
-              <label class="service-card" data-service="takeaway">
-                <input type="radio" name="service-type" value="Bungkus / Takeaway (Stand Batang Agam)" />
-                <span class="s-icon">🛍️</span>
-                <strong>Bungkus / Takeaway</strong>
-                <small>Ambil di Stand</small>
-              </label>
-
-              <label class="service-card" data-service="delivery">
-                <input type="radio" name="service-type" value="Pesan Antar / Delivery Payakumbuh" />
-                <span class="s-icon">🛵</span>
-                <strong>Pesan Antar</strong>
-                <small>Area Payakumbuh</small>
-              </label>
+            <div class="form-group full-width">
+              <span class="modern-label">Ekstra Tambahan (Opsional)</span>
+              <div class="extras-grid">
+                <label class="extra-chip">
+                  <input type="checkbox" value="Ekstra Sambal (+Rp 1.000)" data-price="1000" class="extra-item" />
+                  <span>🌶️ Ekstra Sambal (+Rp 1k)</span>
+                </label>
+                <label class="extra-chip">
+                  <input type="checkbox" value="Ekstra Nasi (+Rp 2.000)" data-price="2000" class="extra-item" />
+                  <span>🍚 Ekstra Nasi (+Rp 2k)</span>
+                </label>
+                <label class="extra-chip">
+                  <input type="checkbox" value="Ekstra Tahu Tempe (+Rp 1.000)" data-price="1000" class="extra-item" />
+                  <span>🧈 Tahu Tempe (+Rp 1k)</span>
+                </label>
+              </div>
             </div>
-          </div>
 
-          <div class="form-group full-width">
-            <span class="modern-label">Ekstra Tambahan (Opsional)</span>
-            <div class="extras-grid">
-              <label class="extra-chip">
-                <input type="checkbox" value="Ekstra Sambal Geprek (+Rp 1.000)" data-price="1000" class="extra-item" />
-                <span>🌶️ Ekstra Sambal (+Rp 1k)</span>
-              </label>
-              <label class="extra-chip">
-                <input type="checkbox" value="Ekstra Nasi Putih (+Rp 2.000)" data-price="2000" class="extra-item" />
-                <span>🍚 Ekstra Nasi (+Rp 2k)</span>
-              </label>
-              <label class="extra-chip">
-                <input type="checkbox" value="Ekstra Tahu & Tempe (+Rp 1.000)" data-price="1000" class="extra-item" />
-                <span>🧈 Tahu Tempe (+Rp 1k)</span>
-              </label>
+            <div class="form-group full-width form-floating">
+              <input type="text" id="item-note" placeholder=" " />
+              <label for="item-note">Catatan Khusus Menu Ini (Cth: Sambal dipisah)</label>
             </div>
-          </div>
 
-          <div class="form-group full-width form-floating" id="address-field-group" style="display: none;">
-            <input type="text" id="cust-address" placeholder=" " />
-            <label for="cust-address">Alamat Lengkap / Patokan Pengiriman</label>
+            <button type="button" id="btn-add-to-cart" class="btn-add-cart">
+              🛒 Tambah ke Keranjang
+            </button>
           </div>
-
-          <div class="form-group full-width form-floating">
-            <textarea id="cust-note" rows="2" placeholder=" "></textarea>
-            <label for="cust-note">Catatan Khusus (Cth: Sambal dipisah)</label>
-          </div>
-
         </div>
 
+        <!-- STEP 2: KERANJANG PESANAN -->
+        <div class="form-section-box">
+          <h3 class="step-title"><span>2</span> Keranjang Pesanan</h3>
+          <div id="cart-items-container">
+            <div class="empty-cart-msg">Keranjang masih kosong. Yuk tambah menu di atas!</div>
+            <!-- Item keranjang akan muncul di sini via JavaScript -->
+          </div>
+        </div>
+
+        <!-- STEP 3: DATA PENGIRIMAN & CHECKOUT -->
+        <div class="form-section-box">
+          <h3 class="step-title"><span>3</span> Checkout & Layanan</h3>
+          
+          <div class="form-grid">
+            <div class="form-group full-width form-floating">
+              <input type="text" id="cust-name" placeholder=" " />
+              <label for="cust-name">Nama Pemesan / Pembeli</label>
+            </div>
+
+            <div class="form-group full-width">
+              <span class="modern-label">Pilih Jenis Layanan</span>
+              <div class="service-cards-grid">
+                <label class="service-card active" data-service="dinein">
+                  <input type="radio" name="service-type" value="Makan di Tempat (Stand Batang Agam)" checked />
+                  <span class="s-icon">🍽️</span>
+                  <strong>Makan di Tempat</strong>
+                  <small>Stand Batang Agam</small>
+                </label>
+                <label class="service-card" data-service="takeaway">
+                  <input type="radio" name="service-type" value="Bungkus / Takeaway (Stand Batang Agam)" />
+                  <span class="s-icon">🛍️</span>
+                  <strong>Bungkus / Ambil Sendiri</strong>
+                </label>
+                <label class="service-card" data-service="delivery">
+                  <input type="radio" name="service-type" value="Pesan Antar / Delivery Payakumbuh" />
+                  <span class="s-icon">🛵</span>
+                  <strong>Pesan Antar</strong>
+                  <small>Area Payakumbuh</small>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group full-width form-floating" id="address-field-group" style="display: none;">
+              <input type="text" id="cust-address" placeholder=" " />
+              <label for="cust-address">Alamat Lengkap / Patokan Pengiriman</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUMMARY CHECKOUT -->
         <div class="order-summary-box modern-summary">
           <div class="summary-text">
-            <span>Total Estimasi:</span>
-            <strong id="live-total-price">Rp 17.000</strong>
+            <span>Total Pembayaran:</span>
+            <strong id="live-total-price">Rp 0</strong>
           </div>
-          <button type="submit" class="btn btn-primary btn-large btn-submit-wa glowing-btn">
+          <button type="button" id="btn-submit-wa" class="btn btn-primary btn-large glowing-btn">
             Kirim Pesanan Via WA 💬
           </button>
         </div>
+
       </form>
     </div>
   </section>
-
+  
   <!-- Location & Operating Hours Section -->
   <section id="info" class="section">
     <div class="info-card-box reveal">

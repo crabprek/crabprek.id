@@ -1125,3 +1125,120 @@ button {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ==========================================================================
+   CART SYSTEM STYLES
+   ========================================================================== */
+.form-section-box {
+  background: rgba(10, 12, 18, 0.4);
+  border: 1px solid rgba(245, 235, 221, 0.05);
+  padding: 24px;
+  border-radius: 20px;
+  margin-bottom: 24px;
+}
+
+.step-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+  color: var(--seafood-orange);
+  margin-bottom: 24px;
+  font-weight: 900;
+}
+
+.step-title span {
+  background: var(--crab-red);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.btn-add-cart {
+  width: 100%;
+  padding: 16px;
+  background: rgba(215, 243, 74, 0.1);
+  border: 1px solid var(--lime);
+  color: var(--lime);
+  font-weight: 900;
+  border-radius: 16px;
+  margin-top: 12px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.btn-add-cart:hover {
+  background: var(--lime);
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(215, 243, 74, 0.2);
+}
+
+.empty-cart-msg {
+  text-align: center;
+  padding: 30px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 16px;
+  border: 1px dashed rgba(245,235,221,0.2);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(245,235,221,0.1);
+  border-radius: 16px;
+  margin-bottom: 12px;
+  animation: floatAnim 0.3s ease-out;
+}
+
+.cart-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.cart-item-details strong {
+  font-size: 15px;
+  color: #fff;
+}
+
+.cart-item-details small {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.cart-item-price {
+  color: var(--seafood-orange);
+  font-weight: 900;
+  font-size: 15px;
+  margin-top: 6px;
+  display: block;
+}
+
+.btn-remove-item {
+  background: transparent;
+  border: none;
+  color: rgba(255,64,56,0.6);
+  font-size: 18px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-remove-item:hover {
+  color: var(--crab-red);
+  transform: scale(1.2);
+}

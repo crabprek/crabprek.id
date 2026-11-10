@@ -468,4 +468,46 @@ document.addEventListener('DOMContentLoaded', () => {
     revealElements.forEach(el => revealObserver.observe(el));
   }
 
-});
+  // --------------------------------------------------------------------------
+  // 7. AUTO-SELECT MENU & LIVE STORE STATUS (TARUH DI SINI)
+  // --------------------------------------------------------------------------
+  
+  // Fungsi agar tombol menu langsung otomatis klik menu di Form
+  window.selectMenu = (menuType) => {
+    // Scroll ke form pesanan
+    document.getElementById('order-form').scrollIntoView({behavior: 'smooth'});
+    
+    // Beri jeda sedikit agar scroll selesai, lalu otomatis klik menu yang dipilih
+    setTimeout(() => {
+      const option = document.querySelector(`.product-option[data-product="${menuType}"]`);
+      if(option) option.click(); 
+    }, 500);
+  };
+
+  // Fungsi Jam Buka/Tutup Otomatis (Live)
+  const updateStoreStatus = () => {
+    const badge = document.getElementById('store-status-badge');
+    if (!badge) return;
+    
+    const hour = new Date().getHours(); // Mengambil jam di perangkat pelanggan
+    
+    if (hour >= 7 && hour < 18) {
+      // Jika jam 7 pagi - sebelum jam 6 sore
+      badge.innerHTML = '<span class="pulse-dot"></span> OPEN NOW • 07.00 - 18.00 WIB';
+      badge.style.color = 'var(--lime)';
+      badge.style.borderColor = 'rgba(215, 243, 74, 0.24)';
+      badge.style.background = 'rgba(215, 243, 74, 0.07)';
+    } else {
+      // Jika di luar jam operasional
+      badge.innerHTML = '<span class="pulse-dot" style="background: var(--crab-red); box-shadow: 0 0 12px rgba(255,64,56,0.75);"></span> CLOSED • Buka Besok 07.00 WIB';
+      badge.style.color = 'var(--crab-red)';
+      badge.style.borderColor = 'rgba(255, 64, 56, 0.24)';
+      badge.style.background = 'rgba(255, 64, 56, 0.07)';
+    }
+  };
+  
+  // Jalankan fungsi saat web dibuka, lalu update otomatis tiap 1 menit
+  updateStoreStatus();
+  setInterval(updateStoreStatus, 60000); 
+
+}); // <-- INI ADALAH BARIS PALING TERAKHIR DARI FILE SCRIPT.JS KAMU

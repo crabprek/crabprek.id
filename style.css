@@ -42,11 +42,12 @@ html {
 body {
   min-height: 100vh;
   overflow-x: hidden;
+  /* Warna Midnight Black pekat dengan glow Lime & Red yang lebih tajam di bagian Hero/Beranda */
   background:
-    radial-gradient(circle at 15% 10%, rgba(215, 243, 74, 0.07), transparent 35%),
-    radial-gradient(circle at 85% 20%, rgba(255, 64, 56, 0.08), transparent 40%),
-    radial-gradient(circle at 50% 110%, rgba(255, 138, 36, 0.12), transparent 45%),
-    linear-gradient(180deg, #030406 0%, #0A0C11 40%, #030406 100%);
+    radial-gradient(circle at 10% 15%, rgba(215, 243, 74, 0.16), transparent 30%), /* Glow Lime (Kiri Atas) */
+    radial-gradient(circle at 90% 25%, rgba(255, 64, 56, 0.16), transparent 35%),  /* Glow Red (Kanan Atas) */
+    radial-gradient(circle at 50% 100%, rgba(255, 138, 36, 0.18), transparent 50%), /* Glow Orange (Bawah) */
+    linear-gradient(180deg, #020305 0%, #080A0E 35%, #020305 100%); /* Hitam sangat pekat */
 }
 
 body::before {
@@ -121,18 +122,21 @@ button {
 
 .logo-wrapper {
   height: 40px; 
-  width: auto; /* Membiarkan lebar menyesuaikan logo asli */
+  width: auto; 
   background: transparent;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 12px; /* Membuat sudut wadah membulat */
+  overflow: hidden;
 }
 
 .logo-img {
   height: 100%;
   width: auto;
   object-fit: contain;
+  border-radius: 12px; /* Membuat sudut gambar membulat */
 }
 
 .logo-text {

@@ -21,8 +21,7 @@
   <header class="navbar" id="navbar">
     <a href="#" class="logo" aria-label="CRABPREK Beranda">
       <div class="logo-wrapper">
-        <img src="logo.png" alt="Logo CRABPREK" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
-        <span class="logo-fallback-icon">🦀</span>
+        <img src="logo.png" alt="Logo CRABPREK" class="logo-img" onerror="this.style.display='none';" />
       </div>
       <span class="logo-text">CRAB<span>PREK</span></span>
     </a>
@@ -45,9 +44,9 @@
   <section id="hero" class="hero-section">
     <div class="hero-container">
       <div class="hero-text-content">
-        <div class="status-badge">
+        <div class="status-badge" id="store-status-badge">
           <span class="pulse-dot"></span>
-          OPEN EVERYDAY • 07.00 - 18.00 WIB
+          Cek Jam Operasional...
         </div>
 
         <h1 class="hero-title">
@@ -146,7 +145,7 @@
               <span class="price-old">Rp18.000</span>
               <strong class="price-new">Rp17.000</strong>
             </div>
-            <button type="button" class="btn btn-primary btn-product-wa" onclick="document.getElementById('order-form').scrollIntoView({behavior: 'smooth'})">Pilih Menu 🛒</button>
+            <button type="button" class="btn btn-primary btn-product-wa" onclick="selectMenu('geprek')">Pilih Menu 🛒</button>
           </div>
         </div>
       </article>
@@ -179,7 +178,7 @@
               <span class="price-old">Rp18.000</span>
               <strong class="price-new">Rp17.000</strong>
             </div>
-            <button type="button" class="btn btn-primary btn-product-wa" onclick="document.getElementById('order-form').scrollIntoView({behavior: 'smooth'})">Pilih Menu 🛒</button>
+            <button type="button" class="btn btn-primary btn-product-wa" onclick="selectMenu('matah')">Pilih Menu 🛒</button>
           </div>
         </div>
       </article>

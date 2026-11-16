@@ -1,180 +1,10 @@
 /* ==========================================================================
-   CRABPREK JAVASCRIPT ENGINE — FULL + FINANCIAL MODULE
+   CRABPREK JAVASCRIPT ENGINE (FINAL)
    ========================================================================== */
-
-// 🔗 GANTI DENGAN URL WEB APP GOOGLE APPS SCRIPT MILIKMU
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxNhu-OOG7JwZZw5rQ0ikluzFTZH6hxnlnCksejbXfRi_QcYfvLw5ZgqOdZqC6aeFo/exec";
-
-const BACKUP_KEY = 'crabprek_backup';
-const CSV_COLUMNS = [
-  'timestamp', 'action', 'nama', 'prd', 'varian', 'qty',
-  'statusBayar', 'metode', 'kategori', 'uraian', 'nominal',
-  'keterangan', 'porsi'
-];
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // =========================================================================
-  // 🧩 UTILITY: Toast Notification
-  // =========================================================================
-  const toastContainer = document.getElementById('toast-container');
-
-  function showToast(message, type = 'success') {
-    if (!toastContainer) return;
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
-    toastContainer.appendChild(toast);
-    setTimeout(() => {
-      toast.classList.add('removing');
-      setTimeout(() => toast.remove(), 350);
-    }, 4500);
-  }
-
-  // =========================================================================
-  // 🧩 UTILITY: LocalStorage Backup System
-  // =========================================================================
-  function getBackups() {
-    try { return JSON.parse(localStorage.getItem(BACKUP_KEY) || '[]'); }
-    catch { return []; }
-  }
-
-  function setBackups(list) {
-    localStorage.setItem(BACKUP_KEY, JSON.stringify(list));
-  }
-
-  function saveBackup(payload) {
-    const list = getBackups();
-    list.push({ ...payload, timestamp: payload.timestamp || new Date().toISOString() });
-    setBackups(list);
-    renderBackupList();
-  }
-
-  function removeBackupAt(index) {
-    const list = getBackups();
-    list.splice(index, 1);
-    setBackups(list);
-    renderBackupList();
-  }
-
-  function clearAllBackups() {
-    if (!confirm('Hapus semua data backup di browser ini?')) return;
-    setBackups([]);
-    renderBackupList();
-    showToast('🗑️ Semua backup telah dihapus.', 'info');
-  }
-
-  // =========================================================================
-  // 🧩 UTILITY: Send to Google Apps Script
-  // =========================================================================
-  async function sendToScript(payload, { silent = false } = {}) {
-    try {
-      const res = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-      const text = await res.text();
-      let data = {};
-      try { data = JSON.parse(text); } catch { /* allow non-JSON */ }
-
-      if (data && data.status === 'error') {
-        throw new Error(data.message || 'Server menolak data');
-      }
-
-      if (!silent) showToast('✅ Data berhasil dikirim ke server.', 'success');
-      return { success: true, data };
-    } catch (err) {
-      console.error('[Crabprek] Gagal kirim:', err, payload);
-      saveBackup(payload);
-      if (!silent) {
-        showToast('⚠️ Koneksi gagal. Data disimpan ke backup lokal.', 'warning');
-      }
-      return { success: false, error: err.message };
-    }
-  }
-
-  // =========================================================================
-  // 🧩 UTILITY: Download CSV
-  // =========================================================================
-  function downloadBackupCSV() {
-    const backups = getBackups();
-    if (backups.length === 0) {
-      showToast('ℹ️ Tidak ada data backup untuk diunduh.', 'info');
-      return;
-    }
-
-    const escapeCSV = (val) => {
-      const s = String(val ?? '');
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-    };
-
-    const header = CSV_COLUMNS.join(',');
-    const rows = backups.map(b =>
-      CSV_COLUMNS.map(col => escapeCSV(b[col])).join(',')
-    );
-    const csv = [header, ...rows].join('\r\n');
-
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `crabprek-backup-${new Date().toISOString().slice(0,10)}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    showToast(`✅ CSV berhasil diunduh (${backups.length} entri).`, 'success');
-  }
-
-  // =========================================================================
-  // 🧩 UTILITY: Render backup list
-  // =========================================================================
-  function renderBackupList() {
-    const container = document.getElementById('backup-list');
-    if (!container) return;
-    const backups = getBackups();
-
-    if (backups.length === 0) {
-      container.innerHTML = '<div class="empty-cart-msg">Belum ada backup tersimpan.</div>';
-      return;
-    }
-
-    container.innerHTML = backups.map((b, i) => {
-      const time = new Date(b.timestamp).toLocaleString('id-ID');
-      let desc = '';
-      if (b.action === 'order') desc = `${b.nama} • ${b.varian} ×${b.qty} • ${b.statusBayar} • ${b.metode}`;
-      else if (b.action === 'expense') desc = `${b.kategori} • ${b.uraian} • Rp ${Number(b.nominal || 0).toLocaleString('id-ID')}`;
-      else if (b.action === 'production') desc = `${b.keterangan} • ${b.porsi} porsi`;
-      else desc = JSON.stringify(b).slice(0, 100);
-
-      return `
-        <div class="backup-item">
-          <div class="backup-info">
-            <div class="backup-time">${time}</div>
-            <div class="backup-type">${b.action || 'unknown'}</div>
-            <div class="backup-desc">${desc}</div>
-          </div>
-          <button type="button" class="backup-del" data-idx="${i}" aria-label="Hapus backup">✕</button>
-        </div>
-      `;
-    }).join('');
-
-    container.querySelectorAll('.backup-del').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const idx = parseInt(e.currentTarget.dataset.idx, 10);
-        removeBackupAt(idx);
-      });
-    });
-  }
-
-  // =========================================================================
-  // 1. CUSTOM CURSOR TRAIL ENGINE (existing)
-  // =========================================================================
+  // 1. CUSTOM CURSOR TRAIL ENGINE
   const trailCanvas = document.getElementById('trail-canvas');
   if (trailCanvas) {
     const tCtx = trailCanvas.getContext('2d');
@@ -193,9 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!Number.isFinite(x) || !Number.isFinite(y)) return;
       if (particles.length > 42) particles.shift();
       particles.push({
-        x, y, size: Math.random() * 5.5 + 2.5, alpha: 1,
+        x, y,
+        size: Math.random() * 5.5 + 2.5,
+        alpha: 1,
         color: trailColors[Math.floor(Math.random() * trailColors.length)],
-        vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5 - 1
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5 - 1
       });
     };
 
@@ -225,9 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     animateTrail();
   }
 
-  // =========================================================================
-  // 2. HERO CANVAS 3D ENGINE (existing)
-  // =========================================================================
+  // 2. HERO CANVAS 3D ENGINE
   const canvas = document.getElementById('hero-canvas');
   if (canvas) {
     const ctx = canvas.getContext('2d');
@@ -252,4 +83,431 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.addEventListener('mousemove', (e) => updatePointerPos(e.clientX, e.clientY));
-    canvas.addEventListener('touchstart', (e) => { if (e.touches.length > 0)
+    canvas.addEventListener('touchstart', (e) => { if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+    canvas.addEventListener('touchmove', (e) => { if (e.touches.length > 0) updatePointerPos(e.touches[0].clientX, e.touches[0].clientY); }, { passive: true });
+
+    const resetPointer = () => { targetMouseX = 0; targetMouseY = 0; canvasPointerX = -9999; canvasPointerY = -9999; };
+    canvas.addEventListener('touchend', resetPointer, { passive: true });
+    canvas.addEventListener('touchcancel', resetPointer, { passive: true });
+    canvas.addEventListener('mouseleave', resetPointer);
+
+    const particleCount = 110;
+    let sphereAngle = 0, crabWalkAngle = 0, crabFleeSpeed = 0;
+
+    const drawProceduralCrab = (x, y, scale, legCycle, isFleeing) => {
+      ctx.save();
+      ctx.translate(x, y); ctx.scale(scale, scale);
+      ctx.fillStyle = '#FF4038';
+      ctx.shadowBlur = isFleeing ? 22 : 12;
+      ctx.shadowColor = isFleeing ? '#D7F34A' : '#FF8A24';
+
+      ctx.beginPath(); ctx.ellipse(0, 0, 16, 11, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#F5EBDD';
+      ctx.beginPath(); ctx.arc(-6, -13, 3, 0, Math.PI * 2); ctx.arc(6, -13, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#08090B';
+      ctx.beginPath(); ctx.arc(-6, -14, 1.5, 0, Math.PI * 2); ctx.arc(6, -14, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#FF4038'; ctx.lineWidth = 3.5;
+      ctx.beginPath(); ctx.moveTo(-10, -6); ctx.quadraticCurveTo(-18, -16, -12, -20); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(10, -6); ctx.quadraticCurveTo(18, -16, 12, -20); ctx.stroke();
+      ctx.lineWidth = 2;
+
+      for (let side = -1; side <= 1; side += 2) {
+        for (let i = 0; i < 3; i++) {
+          const legPhase = Math.sin(legCycle + i * 0.8) * (isFleeing ? 7 : 4);
+          const startX = side * 12, startY = -2 + i * 5;
+          ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(startX + side * 10, startY + legPhase); ctx.lineTo(startX + side * 14, startY + 8 + legPhase); ctx.stroke();
+        }
+      }
+
+      if (isFleeing) { ctx.fillStyle = '#D7F34A'; ctx.font = 'bold 10px sans-serif'; ctx.fillText('💨 KABUR!', -20, -28); }
+      ctx.restore();
+    };
+
+    const drawVisualStage = () => {
+      ctx.clearRect(0, 0, width, height);
+      mouseX += (targetMouseX - mouseX) * 0.02; mouseY += (targetMouseY - mouseY) * 0.02;
+      const scrollSpeed = Math.min(window.scrollY * 0.0005, 0.002);
+      sphereAngle += 0.004 + scrollSpeed;
+
+      const centerX = width * 0.5 + mouseX * 10, centerY = height * 0.5 + mouseY * 10;
+      const radius = Math.min(width, height) * 0.32;
+      const crabX = Math.cos(crabWalkAngle) * (radius * 0.95), crabY = -radius * 0.85 + Math.sin(crabWalkAngle * 2) * 8;
+      const crabAbsX = centerX + crabX, crabAbsY = centerY + crabY;
+      const distToPointer = Math.hypot(canvasPointerX - crabAbsX, canvasPointerY - crabAbsY);
+      const isTouchNear = distToPointer < 70;
+
+      crabFleeSpeed = isTouchNear ? 0.03 : crabFleeSpeed * 0.94;
+      crabWalkAngle += 0.010 + crabFleeSpeed + scrollSpeed * 0.4;
+
+      ctx.save(); ctx.translate(centerX, centerY);
+      for (let i = 0; i < particleCount; i++) {
+        const phi = Math.acos(-1 + (2 * i) / particleCount);
+        const theta = Math.sqrt(particleCount * Math.PI) * phi + sphereAngle;
+        const x = radius * Math.cos(theta) * Math.sin(phi), y = radius * Math.sin(theta) * Math.sin(phi), z = radius * Math.cos(phi);
+        const scale = (z + radius * 1.5) / (radius * 2);
+        const alpha = Math.max(0.1, scale * 0.75);
+
+        ctx.beginPath(); ctx.arc(x, y, 3 * scale, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${10 + (z / radius) * 30}, 95%, 60%, ${alpha})`; ctx.fill();
+      }
+
+      drawProceduralCrab(crabX, crabY, 0.85 + Math.sin(crabWalkAngle) * 0.15, isTouchNear ? crabWalkAngle * 18 : crabWalkAngle * 6, isTouchNear || crabFleeSpeed > 0.02);
+      ctx.restore();
+      requestAnimationFrame(drawVisualStage);
+    };
+    drawVisualStage();
+  }
+
+// --------------------------------------------------------------------------
+  // 3. SISTEM KERANJANG & CHECKOUT (CART SYSTEM)
+  // --------------------------------------------------------------------------
+  let orderCart = [];
+  const BASE_PRICE = 17000;
+
+  // Form Elements
+  const qtyInput = document.getElementById('cust-qty');
+  const btnMinus = document.getElementById('btn-qty-minus');
+  const btnPlus = document.getElementById('btn-qty-plus');
+  const productOptions = document.querySelectorAll('.product-option');
+  const serviceCards = document.querySelectorAll('.service-card');
+  const extraCheckboxes = document.querySelectorAll('.extra-item');
+  const addressGroup = document.getElementById('address-field-group');
+  const addressInput = document.getElementById('cust-address');
+  
+  // Cart Elements
+  const btnAddToCart = document.getElementById('btn-add-to-cart');
+  const cartContainer = document.getElementById('cart-items-container');
+  const liveTotalPrice = document.getElementById('live-total-price');
+  const btnSubmitWA = document.getElementById('btn-submit-wa');
+
+  // Logic: Plus Minus Qty Menu
+  if (btnMinus && btnPlus && qtyInput) {
+    btnMinus.addEventListener('click', () => {
+      let val = parseInt(qtyInput.value, 10) || 1;
+      if (val > 1) qtyInput.value = val - 1;
+    });
+    btnPlus.addEventListener('click', () => {
+      qtyInput.value = (parseInt(qtyInput.value, 10) || 1) + 1;
+    });
+  }
+
+  // Logic: UI Pilihan Menu Aktif
+  productOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      productOptions.forEach(o => o.classList.remove('active'));
+      option.classList.add('active');
+      const radio = option.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+    });
+  });
+
+  // Logic: UI Pilihan Layanan Aktif (Tampil Alamat jika Delivery)
+  serviceCards.forEach(card => {
+    card.addEventListener('click', () => {
+      serviceCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const radio = card.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+      if (addressGroup && addressInput) {
+        if (card.getAttribute('data-service') === 'delivery') {
+          addressGroup.style.display = 'flex'; 
+        } else {
+          addressGroup.style.display = 'none'; 
+          addressInput.value = '';
+        }
+      }
+    });
+  });
+
+  // Fungsi Render Keranjang HTML
+  const renderCart = () => {
+    if (orderCart.length === 0) {
+      cartContainer.innerHTML = '<div class="empty-cart-msg">Keranjang masih kosong. Yuk tambah menu di atas!</div>';
+      liveTotalPrice.textContent = "Rp 0";
+      return;
+    }
+
+    let html = '';
+    let grandTotal = 0;
+
+    orderCart.forEach((item) => {
+      grandTotal += item.total;
+      
+      let extrasText = item.extras.length > 0 ? `<small>➕ ${item.extras.join(', ')}</small>` : '';
+      let noteText = item.note ? `<small>📝 Catatan: ${item.note}</small>` : '';
+
+      html += `
+        <div class="cart-item">
+          <div class="cart-item-details">
+            <strong>${item.qty}x ${item.product}</strong>
+            ${extrasText}
+            ${noteText}
+            <span class="cart-item-price">Rp ${item.total.toLocaleString('id-ID')}</span>
+          </div>
+          <button type="button" class="btn-remove-item" data-id="${item.id}" aria-label="Hapus item">✕</button>
+        </div>
+      `;
+    });
+
+    cartContainer.innerHTML = html;
+    liveTotalPrice.textContent = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+
+    // Event Hapus Item
+    document.querySelectorAll('.btn-remove-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idToRemove = parseInt(e.target.dataset.id);
+        orderCart = orderCart.filter(item => item.id !== idToRemove);
+        renderCart();
+      });
+    });
+  };
+
+  // Logic: Tambah ke Keranjang
+  if (btnAddToCart) {
+    btnAddToCart.addEventListener('click', () => {
+      const activeProduct = document.querySelector('input[name="product-type"]:checked');
+      if(!activeProduct) return;
+
+      const qty = parseInt(qtyInput.value, 10) || 1;
+      const extras = [];
+      let extraTotal = 0;
+
+      extraCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          extras.push(cb.value);
+          extraTotal += parseInt(cb.dataset.price, 10);
+        }
+      });
+
+      const note = document.getElementById('item-note').value.trim();
+      const itemTotal = (BASE_PRICE + extraTotal) * qty;
+
+      const cartItem = {
+        id: Date.now(),
+        product: activeProduct.value,
+        qty: qty,
+        extras: extras,
+        note: note,
+        total: itemTotal
+      };
+
+      orderCart.push(cartItem);
+      renderCart();
+
+      // Feedback Visual Tombol
+      const originalText = btnAddToCart.innerHTML;
+      btnAddToCart.innerHTML = "Berhasil Ditambahkan! ✓";
+      btnAddToCart.style.background = "var(--lime)";
+      btnAddToCart.style.color = "#000";
+      
+      setTimeout(() => {
+        btnAddToCart.innerHTML = originalText;
+        btnAddToCart.style.background = "";
+        btnAddToCart.style.color = "";
+      }, 1500);
+
+      // Reset Input Form Menu
+      qtyInput.value = 1;
+      extraCheckboxes.forEach(cb => cb.checked = false);
+      document.getElementById('item-note').value = '';
+    });
+  }
+
+  // Logic: Eksekusi Kirim WA
+  if (btnSubmitWA) {
+    btnSubmitWA.addEventListener('click', () => {
+      if (orderCart.length === 0) {
+        alert("Keranjang pesanan masih kosong! Silakan 'Tambah ke Keranjang' terlebih dahulu.");
+        return;
+      }
+
+      const name = document.getElementById('cust-name').value.trim();
+      if (!name) {
+        alert("Mohon isi Nama Pemesan terlebih dahulu.");
+        document.getElementById('cust-name').focus();
+        return;
+      }
+
+      const activeRadio = document.querySelector('input[name="service-type"]:checked');
+      const selectedService = activeRadio ? activeRadio.value : 'Makan di Tempat';
+      const address = addressInput ? addressInput.value.trim() : '';
+      
+      if (selectedService.includes('Delivery') && !address) {
+        alert("Untuk pesanan Delivery, mohon isi Alamat Lengkap pengiriman.");
+        document.getElementById('cust-address').focus();
+        return;
+      }
+
+      let waMessage = `Halo *CRABPREK Payakumbuh*! Saya ingin memesan:\n\n`;
+      waMessage += `🛒 *DAFTAR PESANAN:*\n`;
+
+      let finalTotal = 0;
+      orderCart.forEach((item, index) => {
+        finalTotal += item.total;
+        waMessage += `\n*${index + 1}. ${item.qty}x ${item.product}*\n`;
+        if (item.extras.length > 0) waMessage += `   ├ Ekstra: ${item.extras.join(', ')}\n`;
+        if (item.note) waMessage += `   ├ Catatan: ${item.note}\n`;
+        waMessage += `   └ Subtotal: Rp ${item.total.toLocaleString('id-ID')}\n`;
+      });
+
+      waMessage += `\n=========================\n`;
+      waMessage += `*TOTAL TAGIHAN: Rp ${finalTotal.toLocaleString('id-ID')}*\n`;
+      waMessage += `=========================\n\n`;
+
+      waMessage += `👤 *DATA PEMESAN:*\n`;
+      waMessage += `• Nama: ${name}\n`;
+      waMessage += `• Layanan: ${selectedService}\n`;
+      if (address) waMessage += `• Alamat Antar: ${address}\n`;
+
+      waMessage += `\nMohon diproses ya kak. Terima kasih!`;
+
+      const waNumber = "6282362129646";
+      const encodedMessage = encodeURIComponent(waMessage);
+      window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank');
+    });
+  }
+
+  // 4. ANALOG CLOCK & MODAL ENGINE (With Logo in Center)
+  const clockModal = document.getElementById('clock-modal');
+  const btnTriggerClock = document.getElementById('trigger-clock-modal');
+  const btnCloseClock = document.getElementById('btn-close-clock');
+  const analogCanvas = document.getElementById('analog-clock-canvas');
+  const digitalText = document.getElementById('digital-clock-text');
+  let clockInterval;
+  
+  // Load Logo untuk Jam
+  const clockLogo = new Image();
+  clockLogo.src = 'logo.png';
+
+  if (clockModal && btnTriggerClock && btnCloseClock && analogCanvas) {
+    const ctxClock = analogCanvas.getContext('2d');
+    let radius = analogCanvas.height / 2;
+    ctxClock.translate(radius, radius);
+    radius = radius * 0.90;
+
+    const drawClock = () => {
+      const now = new Date();
+      let hour = now.getHours(), minute = now.getMinutes(), second = now.getSeconds();
+
+      if (digitalText) digitalText.textContent = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')} WIB`;
+
+      // Background Jam
+      ctxClock.clearRect(-radius * 1.2, -radius * 1.2, radius * 2.4, radius * 2.4);
+      ctxClock.beginPath(); ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+      ctxClock.fillStyle = '#15171d'; ctxClock.fill();
+      ctxClock.strokeStyle = '#D7F34A'; ctxClock.lineWidth = 3; ctxClock.stroke();
+
+      // Gambar Logo di Tengah Jam
+      if (clockLogo.complete) {
+        const logoSize = radius * 0.6;
+        ctxClock.globalAlpha = 0.3; // Dibuat sedikit transparan agar jarum jam tetap terlihat jelas
+        ctxClock.drawImage(clockLogo, -logoSize / 2, -logoSize / 2, logoSize, logoSize);
+        ctxClock.globalAlpha = 1.0;
+      }
+
+      ctxClock.font = radius * 0.15 + "px sans-serif";
+      ctxClock.textBaseline = "middle"; ctxClock.textAlign = "center"; ctxClock.fillStyle = '#F5EBDD';
+      for (let num = 1; num < 13; num++) {
+        let ang = num * Math.PI / 6;
+        ctxClock.rotate(ang); ctxClock.translate(0, -radius * 0.78); ctxClock.rotate(-ang);
+        ctxClock.fillText(num.toString(), 0, 0);
+        ctxClock.rotate(ang); ctxClock.translate(0, radius * 0.78); ctxClock.rotate(-ang);
+      }
+
+      hour = (hour % 12 * Math.PI / 6) + (minute * Math.PI / (6 * 60)) + (second * Math.PI / (360 * 60));
+      minute = (minute * Math.PI / 30) + (second * Math.PI / (30 * 60));
+      second = (second * Math.PI / 30);
+
+      const drawHand = (pos, length, width, color) => {
+        ctxClock.beginPath(); ctx.lineWidth = width; ctx.lineCap = "round";
+        ctxClock.strokeStyle = color;
+        ctxClock.moveTo(0, 0); ctxClock.rotate(pos); ctxClock.lineTo(0, -length);
+        ctxClock.stroke(); ctxClock.rotate(-pos);
+      };
+
+      drawHand(hour, radius * 0.5, 6, '#F5EBDD');
+      drawHand(minute, radius * 0.7, 4, '#F5EBDD');
+      drawHand(second, radius * 0.8, 2, '#FF4038');
+
+      // Titik Tengah Poros Jam
+      ctxClock.beginPath(); ctx.arc(0, 0, 6, 0, 2 * Math.PI);
+      ctxClock.fillStyle = '#FF4038'; ctxClock.fill();
+    };
+
+    btnTriggerClock.addEventListener('click', () => { clockModal.classList.add('active'); drawClock(); clockInterval = setInterval(drawClock, 1000); });
+    const closeModal = () => { clockModal.classList.remove('active'); clearInterval(clockInterval); };
+    btnCloseClock.addEventListener('click', closeModal);
+    clockModal.addEventListener('click', (e) => { if (e.target === clockModal) closeModal(); });
+  }
+
+  // 5. NAVBAR MOBILE TOGGLE
+  const navToggle = document.getElementById('nav-toggle');
+  const navLinks = document.getElementById('nav-links');
+  if (navToggle && navLinks) {
+    navToggle.addEventListener('click', () => {
+      const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
+      navToggle.setAttribute('aria-expanded', !isExpanded);
+      navLinks.classList.toggle('active');
+    });
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => { navToggle.setAttribute('aria-expanded', 'false'); navLinks.classList.remove('active'); });
+    });
+  }
+
+  // 6. SCROLL REVEAL ANIMATION
+  const revealElements = document.querySelectorAll('.reveal');
+  if (revealElements.length > 0) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) { entry.target.classList.add('active'); revealObserver.unobserve(entry.target); }
+      });
+    }, { 
+      threshold: 0.05, 
+      rootMargin: "0px 0px 50px 0px" // Diubah: elemen akan muncul 50px SEBELUM masuk ke layar
+    });
+    revealElements.forEach(el => revealObserver.observe(el));
+  }
+
+  // --------------------------------------------------------------------------
+  // 7. AUTO-SELECT MENU & LIVE STORE STATUS (TARUH DI SINI)
+  // --------------------------------------------------------------------------
+  
+  // Fungsi agar tombol menu langsung otomatis klik menu di Form
+  window.selectMenu = (menuType) => {
+    // Scroll ke form pesanan
+    document.getElementById('order-form').scrollIntoView({behavior: 'smooth'});
+    
+    // Beri jeda sedikit agar scroll selesai, lalu otomatis klik menu yang dipilih
+    setTimeout(() => {
+      const option = document.querySelector(`.product-option[data-product="${menuType}"]`);
+      if(option) option.click(); 
+    }, 500);
+  };
+
+  // Fungsi Jam Buka/Tutup Otomatis (Live)
+  const updateStoreStatus = () => {
+    const badge = document.getElementById('store-status-badge');
+    if (!badge) return;
+    
+    const hour = new Date().getHours(); // Mengambil jam di perangkat pelanggan
+    
+    if (hour >= 7 && hour < 18) {
+      // Jika jam 7 pagi - sebelum jam 6 sore
+      badge.innerHTML = '<span class="pulse-dot"></span> OPEN NOW • 07.00 - 18.00 WIB';
+      badge.style.color = 'var(--lime)';
+      badge.style.borderColor = 'rgba(215, 243, 74, 0.24)';
+      badge.style.background = 'rgba(215, 243, 74, 0.07)';
+    } else {
+      // Jika di luar jam operasional
+      badge.innerHTML = '<span class="pulse-dot" style="background: var(--crab-red); box-shadow: 0 0 12px rgba(255,64,56,0.75);"></span> CLOSED • Buka Besok 07.00 WIB';
+      badge.style.color = 'var(--crab-red)';
+      badge.style.borderColor = 'rgba(255, 64, 56, 0.24)';
+      badge.style.background = 'rgba(255, 64, 56, 0.07)';
+    }
+  };
+  
+  // Jalankan fungsi saat web dibuka, lalu update otomatis tiap 1 menit
+  updateStoreStatus();
+  setInterval(updateStoreStatus, 60000); 
+
+}); // <-- INI ADALAH BARIS PALING TERAKHIR DARI FILE SCRIPT.JS KAMU

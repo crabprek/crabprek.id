@@ -12,9 +12,6 @@
   <!-- Custom Cursor Particle Canvas -->
   <canvas id="trail-canvas" aria-hidden="true"></canvas>
 
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
-
   <!-- Ambient Light Orbs -->
   <div class="glow-orb orb-1" aria-hidden="true"></div>
   <div class="glow-orb orb-2" aria-hidden="true"></div>
@@ -87,9 +84,11 @@
         </div>
       </div>
 
+      <!-- Hero Visual Stage Canvas 3D & Previews -->
       <div class="hero-visual-stage">
         <canvas id="hero-canvas"></canvas>
 
+        <!-- Preview Sambal Geprek -->
         <div class="hero-product-preview preview-top">
           <img src="crabprek-sambel-geprek.jpg" alt="Crabprek Sambal Geprek" loading="eager" />
           <div class="hero-preview-copy">
@@ -98,8 +97,9 @@
           </div>
         </div>
 
+        <!-- Preview Sambal Matah -->
         <div class="hero-product-preview preview-bottom">
-          <img src="crabprek-sambel-matah.jpg" alt="Crabprek Sambal Matah" loading="eager" />
+          <img src="crabprek-sambal-matah.jpg" alt="Crabprek Sambal Matah" loading="eager" />
           <div class="hero-preview-copy">
             <span>Fresh & Spicy 🌿</span>
             <strong>Sambal Matah</strong>
@@ -109,7 +109,7 @@
     </div>
   </section>
 
-  <!-- Product Showcase Section -->
+<!-- Product Showcase Section -->
   <section id="product" class="section">
     <div class="section-header">
       <span class="section-tag">KATALOG MENU UTAMA</span>
@@ -117,6 +117,7 @@
     </div>
 
     <div class="product-grid">
+      <!-- Produk 1: Sambal Geprek -->
       <article class="product-card tilt-card reveal">
         <div class="product-media-box">
           <span class="discount-badge">DISCOUNT</span>
@@ -149,10 +150,11 @@
         </div>
       </article>
 
+      <!-- Produk 2: Sambal Matah -->
       <article class="product-card tilt-card reveal">
         <div class="product-media-box">
           <span class="discount-badge">DISCOUNT</span>
-          <img src="crabprek-sambel-matah.jpg" alt="Crabprek Sambal Matah" class="product-img" loading="lazy" />
+          <img src="crabprek-sambal-matah.jpg" alt="Crabprek Sambal Matah" class="product-img" loading="lazy" />
         </div>
 
         <div class="product-body">
@@ -183,7 +185,7 @@
     </div>
   </section>
 
-  <!-- Interactive Order Form Section -->
+<!-- Interactive Order Form Section -->
   <section id="order-form" class="section">
     <div class="order-card-wrapper reveal">
       <div class="section-header">
@@ -214,7 +216,7 @@
 
                 <label class="product-option" data-product="matah">
                   <input type="radio" name="product-type" value="Crabprek Sambal Matah" />
-                  <img src="crabprek-sambel-matah.jpg" alt="Sambal Matah" loading="lazy" />
+                  <img src="crabprek-sambal-matah.jpg" alt="Sambal Matah" loading="lazy" />
                   <div class="option-info">
                     <strong>Sambal Matah</strong>
                     <small>Rp17.000 (Paket)</small>
@@ -267,6 +269,7 @@
           <h3 class="step-title"><span>2</span> Keranjang Pesanan</h3>
           <div id="cart-items-container">
             <div class="empty-cart-msg">Keranjang masih kosong. Yuk tambah menu di atas!</div>
+            <!-- Item keranjang akan muncul di sini via JavaScript -->
           </div>
         </div>
 
@@ -307,40 +310,6 @@
               <input type="text" id="cust-address" placeholder=" " />
               <label for="cust-address">Alamat Lengkap / Patokan Pengiriman</label>
             </div>
-
-            <!-- ✅ NEW: METODE PEMBAYARAN -->
-            <div class="form-group full-width">
-              <span class="modern-label">Metode Pembayaran</span>
-              <div class="payment-grid">
-                <label class="payment-option active">
-                  <input type="radio" name="payment-method" value="Tunai" checked />
-                  <span>💵 Tunai</span>
-                </label>
-                <label class="payment-option">
-                  <input type="radio" name="payment-method" value="QRIS" />
-                  <span>📱 QRIS</span>
-                </label>
-                <label class="payment-option">
-                  <input type="radio" name="payment-method" value="Transfer Bank" />
-                  <span>🏦 Transfer Bank</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- ✅ NEW: STATUS PEMBAYARAN -->
-            <div class="form-group full-width">
-              <span class="modern-label">Status Pembayaran</span>
-              <div class="payment-grid">
-                <label class="payment-option active">
-                  <input type="radio" name="payment-status" value="Lunas" checked />
-                  <span>✅ Lunas</span>
-                </label>
-                <label class="payment-option">
-                  <input type="radio" name="payment-status" value="Belum Bayar" />
-                  <span>⏳ Belum Bayar</span>
-                </label>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -356,118 +325,6 @@
         </div>
 
       </form>
-    </div>
-  </section>
-
-  <!-- ✅ NEW: ADMIN PANEL (Hidden, toggle via floating button) -->
-  <section id="admin-panel" class="section admin-section">
-    <div class="admin-wrapper">
-      <div class="section-header">
-        <span class="section-tag">PANEL INTERNAL</span>
-        <h2>Pencatatan <span class="gradient-text">Keuangan</span></h2>
-        <p>Modul integrasi otomatis ke Google Sheets via Apps Script. Data langsung terkirim saat submit.</p>
-      </div>
-
-      <div class="admin-tabs">
-        <button type="button" class="admin-tab active" data-tab="expense">💸 Pengeluaran</button>
-        <button type="button" class="admin-tab" data-tab="production">🦀 Produksi</button>
-        <button type="button" class="admin-tab" data-tab="backup">💾 Backup & CSV</button>
-      </div>
-
-      <!-- Expense Panel -->
-      <div class="admin-tab-panel active" id="panel-expense">
-        <form id="expense-form" onsubmit="return false;">
-          <div class="form-grid">
-            <div class="form-group full-width">
-              <span class="modern-label">PRD</span>
-              <select id="expense-prd" class="modern-select">
-                <option value="PRD-001">PRD-001 (Produk Crabprek)</option>
-                <option value="UMUM">UMUM (Biaya Umum)</option>
-              </select>
-            </div>
-
-            <div class="form-group full-width">
-              <span class="modern-label">Kategori</span>
-              <select id="expense-kategori" class="modern-select">
-                <option value="Bahan Baku">Bahan Baku</option>
-                <option value="Operasional">Operasional</option>
-                <option value="Gaji / Upah">Gaji / Upah</option>
-                <option value="Peralatan">Peralatan</option>
-                <option value="Promosi">Promosi</option>
-                <option value="Lain-lain">Lain-lain</option>
-              </select>
-            </div>
-
-            <div class="form-group full-width form-floating">
-              <input type="text" id="expense-uraian" placeholder=" " />
-              <label for="expense-uraian">Uraian / Keterangan Pengeluaran</label>
-            </div>
-
-            <div class="form-group full-width form-floating">
-              <input type="number" id="expense-nominal" placeholder=" " min="0" />
-              <label for="expense-nominal">Nominal (Rp)</label>
-            </div>
-
-            <div class="form-group full-width">
-              <span class="modern-label">Metode Pembayaran</span>
-              <select id="expense-metode" class="modern-select">
-                <option value="Tunai">Tunai</option>
-                <option value="QRIS">QRIS</option>
-                <option value="Transfer Bank">Transfer Bank</option>
-              </select>
-            </div>
-
-            <button type="button" id="btn-submit-expense" class="btn-admin-action">
-              💸 Kirim Data Pengeluaran
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Production Panel -->
-      <div class="admin-tab-panel" id="panel-production">
-        <form id="production-form" onsubmit="return false;">
-          <div class="form-grid">
-            <div class="form-group full-width form-floating">
-              <input type="text" id="production-keterangan" placeholder=" " />
-              <label for="production-keterangan">Keterangan Produksi (Cth: Batch pagi geprek)</label>
-            </div>
-
-            <div class="form-group full-width form-floating">
-              <input type="number" id="production-porsi" placeholder=" " min="1" />
-              <label for="production-porsi">Jumlah Porsi</label>
-            </div>
-
-            <button type="button" id="btn-submit-production" class="btn-admin-action">
-              🦀 Kirim Data Produksi
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Backup Panel -->
-      <div class="admin-tab-panel" id="panel-backup">
-        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px; line-height: 1.6;">
-          Data yang gagal terkirim otomatis disimpan di localStorage browser ini. 
-          Unduh sebagai CSV atau kirim ulang saat koneksi pulih.
-        </p>
-
-        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;">
-          <button type="button" id="btn-download-csv" class="btn-secondary-action" style="flex:1; min-width: 160px;">
-            ⬇️ Unduh CSV
-          </button>
-          <button type="button" id="btn-retry-backup" class="btn-secondary-action" style="flex:1; min-width: 160px;">
-            🔁 Kirim Ulang Semua
-          </button>
-          <button type="button" id="btn-clear-backup" class="btn-secondary-action" style="flex:1; min-width: 160px; border-color: var(--crab-red); color: var(--crab-red);">
-            🗑️ Hapus Backup
-          </button>
-        </div>
-
-        <div id="backup-list" class="backup-list">
-          <div class="empty-cart-msg">Belum ada backup tersimpan.</div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -515,6 +372,7 @@
       </div>
     </div>
 
+    <!-- Footer -->
     <footer class="footer">
       <div class="footer-left">
         <strong>CRABPREK.ID</strong>
@@ -559,10 +417,5 @@
   <a href="#order-form" class="floating-order-btn">
     🛒 Pesan Sekarang
   </a>
-
-  <!-- ✅ NEW: Floating Admin Toggle -->
-  <button type="button" id="admin-toggle-btn" class="floating-admin-btn" aria-label="Buka Panel Admin">
-    🔐 Admin
-  </button>
 </body>
 </html>

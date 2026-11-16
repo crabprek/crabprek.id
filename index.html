@@ -346,14 +346,16 @@
         </a>
 
         <div class="info-tile tile-clickable" id="trigger-clock-modal">
-          <div class="tile-icon">⏰</div>
-          <h3>Jam Operasional ⌚</h3>
-          <p>
-            <strong>Buka Setiap Hari</strong><br />
-            Pukul 07.00 – 18.00 WIB<br />
-            <small class="click-hint">Klik untuk lihat jam analog live 🕒</small>
-          </p>
-        </div>
+  <div class="tile-clock-preview">
+    <canvas id="inline-clock-canvas" width="72" height="72"></canvas>
+  </div>
+  <h3>Jam Operasional ⌚</h3>
+  <p>
+    <strong id="inline-digital-clock" class="live-clock-text">--:--:-- WIB</strong><br />
+    Pukul 07.00 – 18.00 WIB<br />
+    <small class="click-hint">Klik untuk lihat jam besar 🕒</small>
+  </p>
+</div>
 
         <a href="https://wa.me/6282362129646" target="_blank" rel="noopener" class="info-tile tile-clickable">
           <div class="tile-icon">📱</div>

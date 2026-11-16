@@ -367,18 +367,111 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 4. ANALOG CLOCK & MODAL ENGINE (With Logo in Center)
+  // 4. ANALOG CLOCK — INLINE (selalu tampil) + MODAL (saat diklik)
   const clockModal = document.getElementById('clock-modal');
   const btnTriggerClock = document.getElementById('trigger-clock-modal');
   const btnCloseClock = document.getElementById('btn-close-clock');
   const analogCanvas = document.getElementById('analog-clock-canvas');
   const digitalText = document.getElementById('digital-clock-text');
+  const inlineCanvas = document.getElementById('inline-clock-canvas');
+  const inlineDigital = document.getElementById('inline-digital-clock');
   let clockInterval;
-  
-  // Load Logo untuk Jam
+
+  // Load logo untuk jam (opsional, kalau logo.png tidak ada tetap jalan)
   const clockLogo = new Image();
   clockLogo.src = 'logo.png';
 
+  // ---------- INLINE CLOCK (mini, selalu berjalan di tile) ----------
+  if (inlineCanvas) {
+    const ictx = inlineCanvas.getContext('2d');
+    const iSize = inlineCanvas.width;
+    const iCenter = iSize / 2;
+    const iRadius = iCenter - 4;
+
+    const drawInlineClock = () => {
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+
+      ictx.clearRect(0, 0, iSize, iSize);
+      ictx.save();
+      ictx.translate(iCenter, iCenter);
+
+      // Lingkaran muka jam
+      ictx.beginPath();
+      ictx.arc(0, 0, iRadius, 0, Math.PI * 2);
+      ictx.fillStyle = '#101217';
+      ictx.fill();
+      ictx.strokeStyle = 'rgba(215, 243, 74, 0.6)';
+      ictx.lineWidth = 1.5;
+      ictx.stroke();
+
+      // 12 tick mark
+      for (let i = 0; i < 12; i++) {
+        const ang = (i * Math.PI / 6) - Math.PI / 2;
+        const isMajor = i % 3 === 0;
+        const inner = iRadius * (isMajor ? 0.72 : 0.8);
+        const outer = iRadius * 0.92;
+        ictx.beginPath();
+        ictx.moveTo(Math.cos(ang) * inner, Math.sin(ang) * inner);
+        ictx.lineTo(Math.cos(ang) * outer, Math.sin(ang) * outer);
+        ictx.strokeStyle = isMajor ? '#FF8A24' : 'rgba(245, 235, 221, 0.45)';
+        ictx.lineWidth = isMajor ? 2 : 1;
+        ictx.lineCap = 'round';
+        ictx.stroke();
+      }
+
+      // Jarum jam
+      const hAng = ((h % 12) * Math.PI / 6) + (m * Math.PI / 360) - Math.PI / 2;
+      ictx.beginPath();
+      ictx.moveTo(0, 0);
+      ictx.lineTo(Math.cos(hAng) * iRadius * 0.5, Math.sin(hAng) * iRadius * 0.5);
+      ictx.strokeStyle = '#F5EBDD';
+      ictx.lineWidth = 3;
+      ictx.lineCap = 'round';
+      ictx.stroke();
+
+      // Jarum menit
+      const mAng = (m * Math.PI / 30) + (s * Math.PI / 1800) - Math.PI / 2;
+      ictx.beginPath();
+      ictx.moveTo(0, 0);
+      ictx.lineTo(Math.cos(mAng) * iRadius * 0.72, Math.sin(mAng) * iRadius * 0.72);
+      ictx.strokeStyle = '#F5EBDD';
+      ictx.lineWidth = 2;
+      ictx.lineCap = 'round';
+      ictx.stroke();
+
+      // Jarum detik
+      const sAng = (s * Math.PI / 30) - Math.PI / 2;
+      ictx.beginPath();
+      ictx.moveTo(0, 0);
+      ictx.lineTo(Math.cos(sAng) * iRadius * 0.85, Math.sin(sAng) * iRadius * 0.85);
+      ictx.strokeStyle = '#FF4038';
+      ictx.lineWidth = 1;
+      ictx.lineCap = 'round';
+      ictx.stroke();
+
+      // Titik tengah
+      ictx.beginPath();
+      ictx.arc(0, 0, 2.5, 0, Math.PI * 2);
+      ictx.fillStyle = '#FF4038';
+      ictx.fill();
+
+      ictx.restore();
+
+      // Update teks digital di bawah jam
+      if (inlineDigital) {
+        const pad = n => n.toString().padStart(2, '0');
+        inlineDigital.textContent = `${pad(h)}:${pad(m)}:${pad(s)} WIB`;
+      }
+    };
+
+    drawInlineClock();
+    setInterval(drawInlineClock, 1000);
+  }
+
+  // ---------- MODAL CLOCK (jam besar, muncul saat tile diklik) ----------
   if (clockModal && btnTriggerClock && btnCloseClock && analogCanvas) {
     const ctxClock = analogCanvas.getContext('2d');
     let radius = analogCanvas.height / 2;
@@ -389,22 +482,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const now = new Date();
       let hour = now.getHours(), minute = now.getMinutes(), second = now.getSeconds();
 
-      if (digitalText) digitalText.textContent = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')} WIB`;
+      if (digitalText) {
+        digitalText.textContent = `${hour.toString().padStart(2, '0')}:${minute
+          .toString().padStart(2, '0')}:${second.toString().padStart(2, '0')} WIB`;
+      }
 
-      // Background Jam
       ctxClock.clearRect(-radius * 1.2, -radius * 1.2, radius * 2.4, radius * 2.4);
-      ctxClock.beginPath(); ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+      ctxClock.beginPath(); ctxClock.arc(0, 0, radius, 0, 2 * Math.PI);
       ctxClock.fillStyle = '#15171d'; ctxClock.fill();
       ctxClock.strokeStyle = '#D7F34A'; ctxClock.lineWidth = 3; ctxClock.stroke();
 
-      // Gambar Logo di Tengah Jam
-      if (clockLogo.complete) {
+      // Logo di tengah jam (kalau ada)
+      if (clockLogo.complete && clockLogo.naturalWidth > 0) {
         const logoSize = radius * 0.6;
-        ctxClock.globalAlpha = 0.3; // Dibuat sedikit transparan agar jarum jam tetap terlihat jelas
+        ctxClock.globalAlpha = 0.3;
         ctxClock.drawImage(clockLogo, -logoSize / 2, -logoSize / 2, logoSize, logoSize);
         ctxClock.globalAlpha = 1.0;
       }
 
+      // Angka 1-12
       ctxClock.font = radius * 0.15 + "px sans-serif";
       ctxClock.textBaseline = "middle"; ctxClock.textAlign = "center"; ctxClock.fillStyle = '#F5EBDD';
       for (let num = 1; num < 13; num++) {
@@ -419,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
       second = (second * Math.PI / 30);
 
       const drawHand = (pos, length, width, color) => {
-        ctxClock.beginPath(); ctx.lineWidth = width; ctx.lineCap = "round";
+        ctxClock.beginPath(); ctxClock.lineWidth = width; ctxClock.lineCap = "round";
         ctxClock.strokeStyle = color;
         ctxClock.moveTo(0, 0); ctxClock.rotate(pos); ctxClock.lineTo(0, -length);
         ctxClock.stroke(); ctxClock.rotate(-pos);
@@ -429,13 +525,20 @@ document.addEventListener('DOMContentLoaded', () => {
       drawHand(minute, radius * 0.7, 4, '#F5EBDD');
       drawHand(second, radius * 0.8, 2, '#FF4038');
 
-      // Titik Tengah Poros Jam
-      ctxClock.beginPath(); ctx.arc(0, 0, 6, 0, 2 * Math.PI);
+      ctxClock.beginPath(); ctxClock.arc(0, 0, 6, 0, 2 * Math.PI);
       ctxClock.fillStyle = '#FF4038'; ctxClock.fill();
     };
 
-    btnTriggerClock.addEventListener('click', () => { clockModal.classList.add('active'); drawClock(); clockInterval = setInterval(drawClock, 1000); });
-    const closeModal = () => { clockModal.classList.remove('active'); clearInterval(clockInterval); };
+    btnTriggerClock.addEventListener('click', () => {
+      clockModal.classList.add('active');
+      drawClock();
+      clockInterval = setInterval(drawClock, 1000);
+    });
+
+    const closeModal = () => {
+      clockModal.classList.remove('active');
+      clearInterval(clockInterval);
+    };
     btnCloseClock.addEventListener('click', closeModal);
     clockModal.addEventListener('click', (e) => { if (e.target === clockModal) closeModal(); });
   }
